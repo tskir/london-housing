@@ -36,4 +36,6 @@ Open <http://localhost:8000>.
 
 [Open the dashboard on GitHub Pages](https://tskir.github.io/london-housing/).
 
+If the link returns 404, enable Pages once in the repository: **Settings → Pages → Build and deployment → Source: GitHub Actions**. Then rerun the failed **Deploy static site** workflow under **Actions**.
+
 The app loads Chart.js from jsDelivr, so the chart needs an internet connection.
