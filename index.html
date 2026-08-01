@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>London homes started</title>
+  <title>London's housing pipeline</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -12,37 +12,61 @@
 <body>
   <main>
     <header class="hero">
-      <p class="eyebrow">Planning London Datahub</p>
-      <h1>Homes started<br><em>across London.</em></h1>
-      <p class="intro">Every line is a borough. Hover to explore how many homes began construction each year.</p>
+      <p class="eyebrow">London housing · a data story</p>
+      <h1>London's housing pipeline<br><em>is slowing down.</em></h1>
+      <p class="intro">A look at the homes that started construction, and the gaps between the planning process and the building site.</p>
     </header>
     <section class="status" aria-live="polite"><span class="dot"></span><span id="status">Loading bundled data…</span></section>
-    <section class="card chart-card total-card">
-      <div class="card-heading"><div><p class="eyebrow">London total</p><h2>Total units started</h2></div><p class="hint">All boroughs combined.</p></div>
-      <div class="total-chart-wrap"><canvas id="total-chart" aria-label="Line chart showing total units started across London by year"></canvas></div>
+
+    <section class="story-block">
+      <p class="section-number">01 / The signal</p>
+      <h2>Fewer residential units<br><em>are being started.</em></h2>
+      <p class="section-lede">The recorded number of residential units entering construction has fallen sharply in recent years. That is the signal. Now we need to understand the pipeline behind it.</p>
+      <section class="card chart-card">
+        <div class="card-heading"><div><p class="eyebrow">London total · Status: Approved</p><h3>Residential units started</h3></div><p class="hint">2000–2025 · 2026 excluded as incomplete.</p></div>
+        <div class="chart-wrap"><canvas id="total-chart" aria-label="Line chart showing total residential units started across London by year"></canvas></div>
+        <p class="definition"><strong>What counts as a home?</strong> One residential unit. A one-bedroom house counts as 1; a 30-flat apartment block counts as 30.</p>
+      </section>
     </section>
-    <section class="card chart-card borough-card">
-      <div class="card-heading"><div><p class="eyebrow">All boroughs</p><h2>Homes started by year</h2></div><p class="hint">Hover over a line to identify the borough.</p></div>
-      <p class="definition"><strong>What counts as a home?</strong> A home means one residential unit recorded in the planning data. So a one-bedroom house counts as 1, while a 30-flat apartment block counts as 30. The chart counts units, not buildings or bedrooms.</p>
-      <div class="chart-wrap"><canvas id="chart" aria-label="Line chart showing homes started by year in every London borough"></canvas></div>
+
+    <section class="story-block process-block">
+      <p class="section-number">02 / The pipeline</p>
+      <h2>Every home passes<br><em>through three dates.</em></h2>
+      <p class="section-lede">Before a unit can start construction, it moves from an application to a decision, then from a decision to a building site.</p>
+      <div class="timeline">
+        <div class="timeline-step"><span>01</span><h3>Application submitted</h3><p><code>valid_date</code><br>The proposal enters the planning system.</p></div>
+        <div class="timeline-arrow">→</div>
+        <div class="timeline-step"><span>02</span><h3>Application approved</h3><p><code>decision_date</code><br>The authority records its decision.</p></div>
+        <div class="timeline-arrow">→</div>
+        <div class="timeline-step"><span>03</span><h3>Construction started</h3><p><code>actual_commencement_date</code><br>Work is recorded as having begun.</p></div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric"><p class="eyebrow">Council delay</p><h3>Submitted → approved</h3><p>How long the application spends waiting for a decision.</p></div>
+        <div class="metric"><p class="eyebrow">Developer delay</p><h3>Approved → started</h3><p>How long it takes to move from permission to construction.</p></div>
+      </div>
     </section>
-    <section class="lag-hero">
-      <p class="eyebrow">From intention to action</p>
-      <h2>How long does it take to start?</h2>
-      <p>The lag is the average number of months between a borough recording its intended commencement date and its actual commencement date, shown for 2020 onwards.</p>
+
+    <section class="story-block caveat-block">
+      <p class="section-number">03 / The caveat</p>
+      <h2>But how much of<br><em>the pipeline is visible?</em></h2>
+      <p class="section-lede">A delay can only be measured when all three dates are recorded. This is the share of started-residential records with a submission date, an approval date and a construction-start date.</p>
+      <section class="card chart-card">
+        <div class="card-heading"><div><p class="eyebrow">Data completeness</p><h3>Records with all three dates</h3></div><p class="hint">Share of records, by construction-start year.</p></div>
+        <div class="chart-wrap"><canvas id="completeness-chart" aria-label="Line chart showing the percentage of residential records with submission, approval and construction start dates by year"></canvas></div>
+        <p class="definition">The denominator is every allowed residential record with a recorded construction start in that year. The numerator has all three dates needed for both delays.</p>
+      </section>
     </section>
-    <section class="card chart-card lag-card">
-      <div class="card-heading"><div><p class="eyebrow">Average lag by borough · 2020 onwards</p><h2>Intended to actual start</h2></div><p class="hint">Year on X · lag in months on Y.<br>Only boroughs with ≥2% complete records are shown.</p></div>
-      <div class="lag-chart-wrap"><canvas id="lag-chart" aria-label="Line chart showing average months between intended and actual commencement by borough and year"></canvas></div>
+
+    <section class="story-block delays-block">
+      <p class="section-number">04 / The measured delays</p>
+      <h2>Where the records are complete,<br><em>the wait looks like this.</em></h2>
+      <p class="section-lede">These plots use only records where all three dates are present. Medians show the typical wait without letting unusually long cases dominate the story.</p>
+      <div class="delay-grid">
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Council delay</p><h3>Submission to approval</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="council-chart" aria-label="Line chart showing median council delay in months by year"></canvas></div></section>
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="developer-chart" aria-label="Line chart showing median developer delay in months by year"></canvas></div></section>
+      </div>
     </section>
-    <section class="card chart-card overall-lag-card">
-      <div class="card-heading"><div><p class="eyebrow">London average · 2020 onwards</p><h2>Overall average lag</h2></div><p class="hint">All boroughs combined.</p></div>
-      <div class="overall-lag-chart-wrap"><canvas id="overall-lag-chart" aria-label="Line chart showing London's overall average lag in months by year"></canvas></div>
-    </section>
-    <section class="card completeness-card">
-      <div class="card-heading"><div><p class="eyebrow">Data completeness · 2020 onwards</p><h2>How much can we compare?</h2></div><p class="hint">Residential records with both dates.</p></div>
-      <table><thead><tr><th scope="col">Borough</th><th scope="col">Complete records</th></tr></thead><tbody id="completeness"></tbody></table>
-    </section>
+
     <footer>Source: <a href="https://planninglondondatahub.london.gov.uk/" target="_blank" rel="noreferrer">Planning London Datahub</a></footer>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
