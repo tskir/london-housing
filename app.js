@@ -12,9 +12,6 @@ const sizeBands = [
   {label:'501+ units', min:501, max:Infinity}
 ];
 const sizeColors = ['#7b2638','#157f9b','#d67c2f','#5b4b9a','#2f7d50'];
-Chart.defaults.color = '#59615d';
-Chart.defaults.font.family = "'DM Sans', sans-serif";
-Chart.defaults.font.size = 11;
 
 function parseDate(value) {
   if (!value) return null;
@@ -335,32 +332,3 @@ document.querySelectorAll('[data-submission-scale]').forEach(button => button.ad
   submissionScale = button.dataset.submissionScale;
   makeSubmissionChart(data, submissionMode, submissionScale);
 }));
-
-const slides = [...document.querySelectorAll('.hero, .story-block, .chart-card, .data-quality-card, footer, .methodology')];
-const slideCounter = document.querySelector('#slide-counter');
-const slideProgress = document.querySelector('#slide-progress');
-function currentSlideIndex() {
-  let current = 0;
-  slides.forEach((slide, index) => { if (slide.getBoundingClientRect().top <= 96) current = index; });
-  return current;
-}
-function adjacentSlideIndex(current, direction) { return Math.max(0, Math.min(slides.length - 1, current + direction)); }
-console.assert(adjacentSlideIndex(0, -1) === 0 && adjacentSlideIndex(slides.length - 1, 1) === slides.length - 1, 'Slide navigation bounds');
-function updateDeck() {
-  const current = currentSlideIndex();
-  slideCounter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-  slideProgress.style.transform = `scaleX(${(current + 1) / slides.length})`;
-}
-document.addEventListener('keydown', event => {
-  if (event.code !== 'Space' || event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.target.closest?.('button,a,input,select,textarea,summary,[contenteditable="true"]')) return;
-  event.preventDefault();
-  const next = adjacentSlideIndex(currentSlideIndex(), event.shiftKey ? -1 : 1);
-  slides[next].scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',block:'start'});
-});
-let deckFrame;
-addEventListener('scroll', () => {
-  if (deckFrame) return;
-  deckFrame = requestAnimationFrame(() => { updateDeck(); deckFrame = null; });
-}, {passive:true});
-addEventListener('resize', updateDeck);
-updateDeck();
