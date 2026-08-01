@@ -1,5 +1,6 @@
 const status = document.querySelector('#status');
 let chart;
+let totalChart;
 
 function makeChart(data) {
   const years = data.years.buckets.map(bucket => new Date(bucket.key).getUTCFullYear());
@@ -44,5 +45,14 @@ function makeChart(data) {
   chart.update('none');
 }
 
+function makeTotalChart(buckets) {
+  totalChart = new Chart(document.querySelector('#total-chart'), {
+    type: 'line',
+    data: { labels: buckets.map(bucket => new Date(bucket.key).getUTCFullYear()), datasets: [{ label: 'London', data: buckets.map(bucket => bucket.homes.value || 0), borderColor: '#7b2638', backgroundColor: 'rgba(123,38,56,.1)', borderWidth: 2.5, hoverBorderWidth: 4, pointRadius: 0, pointHoverRadius: 4, fill: true, tension: .25 }] },
+    options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'nearest',intersect:false}, plugins:{legend:{display:false},tooltip:{enabled:false}}, scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}} }
+  });
+}
+
 makeChart(window.DATA.aggregations);
+makeTotalChart(window.DATA.aggregations.years.buckets);
 status.textContent = `${window.DATA.hits.total.value.toLocaleString()} construction starts · pre-downloaded API data`;
