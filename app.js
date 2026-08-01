@@ -5,12 +5,11 @@ const minYear = 2000;
 const delayMinYear = 2018;
 const maxYear = 2025;
 const sizeBands = [
-  {label:'1 unit', min:1, max:1},
-  {label:'2–5 units', min:2, max:5},
-  {label:'6–20 units', min:6, max:20},
-  {label:'21–50 units', min:21, max:50},
+  {label:'1–5 units', min:1, max:5},
+  {label:'6–50 units', min:6, max:50},
   {label:'51–200 units', min:51, max:200},
-  {label:'201+ units', min:201, max:Infinity}
+  {label:'201–1000 units', min:201, max:1000},
+  {label:'1001+ units', min:1001, max:Infinity}
 ];
 const sizeColors = ['#7b2638','#a34c5a','#c0787d','#759b8d','#47756d','#294d49'];
 
