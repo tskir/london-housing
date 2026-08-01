@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>London homes started</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <p class="eyebrow">Planning London Datahub</p>
+      <h1>Homes started<br><em>across London.</em></h1>
+      <p class="intro">Every line is a borough. Hover to explore how many homes began construction each year.</p>
+    </header>
+    <section class="status" aria-live="polite"><span class="dot"></span><span id="status">Loading live data…</span></section>
+    <section class="card chart-card">
+      <div class="card-heading"><div><p class="eyebrow">All boroughs</p><h2>Homes started by year</h2></div><p class="hint">Click a borough below to hide or show its line.</p></div>
+      <div class="chart-wrap"><canvas id="chart" aria-label="Line chart showing homes started by year in every London borough"></canvas></div>
+    </section>
+    <footer>Source: <a href="https://planninglondondatahub.london.gov.uk/" target="_blank" rel="noreferrer">Planning London Datahub</a> · live data</footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
