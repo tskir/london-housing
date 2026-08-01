@@ -83,6 +83,27 @@
       <p class="definition size-note">Each line groups applications by proposed residential units: 1–5, 6–50, 51–200, 201–1000, and 1001+.</p>
     </section>
 
+    <section class="methodology">
+      <p class="section-number">06 / Data and method</p>
+      <h2>One source.<br><em>Clear calculations.</em></h2>
+      <p class="section-lede">Every view uses the same pre-downloaded residential application snapshot. No graph queries a separate dataset.</p>
+      <div class="endpoint"><strong>Primary query</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/applications/_search?scroll=1m</code><strong>Next pages</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/_search/scroll</code></div>
+      <p class="method-note">The snapshot includes only records where <code>status.raw</code> is <code>Completed</code> or <code>Commenced</code>, proposed residential units are greater than zero, and <code>actual_commencement_date</code> falls between 2000 and 2025. The browser calculates all measures from the returned fields.</p>
+      <div class="method-table-wrap">
+        <table class="method-table">
+          <thead><tr><th>View</th><th>Fields</th><th>Calculation</th></tr></thead>
+          <tbody>
+            <tr><td>Units started</td><td><code>actual_commencement_date</code><br><code>total_no_proposed_residential_units</code></td><td>Sum proposed units by construction-start year.</td></tr>
+            <tr><td>Completeness</td><td><code>valid_date</code><br><code>decision_date</code><br><code>actual_commencement_date</code></td><td>Records with all three non-empty dates ÷ all records started that year.</td></tr>
+            <tr><td>Council delay</td><td><code>valid_date</code> → <code>decision_date</code></td><td>Median calendar-month difference, using complete records and non-negative intervals, from 2018 onwards.</td></tr>
+            <tr><td>Developer delay</td><td><code>decision_date</code> → <code>actual_commencement_date</code></td><td>Median calendar-month difference, using complete records and non-negative intervals, from 2018 onwards.</td></tr>
+            <tr><td>Application size</td><td><code>total_no_proposed_residential_units</code></td><td>Full distribution shown with dynamically calculated log-spaced histogram bins.</td></tr>
+            <tr><td>Size-split delays</td><td>Application size + the three dates</td><td>Same median delay calculations, split into the five displayed unit bands.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <footer>Source: <a href="https://planninglondondatahub.london.gov.uk/" target="_blank" rel="noreferrer">Planning London Datahub</a></footer>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
