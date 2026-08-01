@@ -2,6 +2,7 @@ const status = document.querySelector('#status');
 const burgundy = '#7b2638';
 const grey = '#b4b0aa';
 const minYear = 1980;
+const lagMinYear = 2020;
 const maxYear = new Date().getUTCFullYear();
 
 function parseDate(value) {
@@ -20,6 +21,7 @@ function boroughName(name) { return name.replace(/^London Borough of /, '').repl
 
 function aggregate(records) {
   const years = Array.from({length:maxYear - minYear + 1}, (_, i) => minYear + i);
+  const lagYears = Array.from({length:maxYear - lagMinYear + 1}, (_, i) => lagMinYear + i);
   const totals = new Map(years.map(year => [year, 0]));
   const boroughs = new Map();
   for (const record of records) {
@@ -28,16 +30,16 @@ function aggregate(records) {
     const actual = parseDate(record.actual_commencement_date);
     const intended = parseDate(record.application_details?.intended_commencement_date);
     const item = boroughs.get(borough) || { records:0, complete:0, totals:new Map(), lags:new Map() };
-    item.records++;
-    if (actual && intended) {
+    const actualYear = actual?.getUTCFullYear();
+    const lagEligible = actualYear >= lagMinYear && actualYear <= maxYear;
+    if (lagEligible) item.records++;
+    if (lagEligible && actual && intended) {
       item.complete++;
-      if (actual.getUTCFullYear() >= minYear && actual.getUTCFullYear() <= maxYear) {
-        const year = actual.getUTCFullYear();
-        const lag = item.lags.get(year) || {sum:0, count:0};
-        lag.sum += monthsBetween(intended, actual);
-        lag.count++;
-        item.lags.set(year, lag);
-      }
+      const year = actual.getUTCFullYear();
+      const lag = item.lags.get(year) || {sum:0, count:0};
+      lag.sum += monthsBetween(intended, actual);
+      lag.count++;
+      item.lags.set(year, lag);
     }
     if (actual && actual.getUTCFullYear() >= minYear && actual.getUTCFullYear() <= maxYear) {
       const year = actual.getUTCFullYear();
@@ -46,7 +48,7 @@ function aggregate(records) {
     }
     boroughs.set(borough, item);
   }
-  return {years, totals, boroughs};
+  return {years, lagYears, totals, boroughs};
 }
 
 const endLabel = { id:'endLabel', afterDraw(chart) {
@@ -80,8 +82,8 @@ function makeBoroughChart(data) {
 }
 
 function makeLagChart(data) {
-  const series = [...data.boroughs].map(([label, borough]) => ({label,data:data.years.map(year => borough.lags.has(year) ? borough.lags.get(year).sum / borough.lags.get(year).count : null),borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}));
-  const chart = new Chart(document.querySelector('#lag-chart'), {type:'line',data:{labels:data.years,datasets:series},plugins:[endLabel],options:{...hoverOptions(),responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{title:{display:true,text:'Average lag (months)'},grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toFixed(0)}}}}});
+  const series = [...data.boroughs].map(([label, borough]) => ({label,data:data.lagYears.map(year => borough.lags.has(year) ? borough.lags.get(year).sum / borough.lags.get(year).count : null),borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}));
+  const chart = new Chart(document.querySelector('#lag-chart'), {type:'line',data:{labels:data.lagYears,datasets:series},plugins:[endLabel],options:{...hoverOptions(),responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{title:{display:true,text:'Average lag (months)'},grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toFixed(0)}}}}});
   styleDatasets(chart);
 }
 

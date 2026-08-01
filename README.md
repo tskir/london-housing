@@ -13,7 +13,7 @@ api_key='be2rmRnt&'
 PLD_API_KEY="$api_key" python3 fetch-data.py
 ```
 
-`fetch-data.py` uses the API's scroll endpoint to download every record with more than zero proposed residential units, using the fields listed in `data-query.json`. The browser then computes homes started, average lag in months from `actual_commencement_date` minus `application_details.intended_commencement_date`, and completeness percentages locally. Records before 1980 are excluded from time series because the API contains malformed historical dates. The API key is the guest key documented in `pld-api.md`.
+`fetch-data.py` uses the API's scroll endpoint to download every record with more than zero proposed residential units, using the fields listed in `data-query.json`. The browser then computes homes started, average lag in months from `actual_commencement_date` minus `application_details.intended_commencement_date`, and completeness percentages locally. Lag and completeness use records with actual commencement dates from 2020 onwards; the other time series start in 1980 because the API contains malformed historical dates before then. The API key is the guest key documented in `pld-api.md`.
 
 After updating `data.js`, commit and push it to publish the new snapshot.
 
