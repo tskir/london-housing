@@ -43,6 +43,14 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 .caveat-block .section-lede { color:#cbd8d1; }
 .caveat-block .card { color:var(--ink); }
 .small-chart-wrap { height:300px; margin-top:26px; }
+.data-quality-card { margin-top:30px; padding:30px; }
+.quality-table-wrap { overflow-x:auto; }
+.quality-table { border-collapse:collapse; margin-top:24px; min-width:620px; width:100%; }
+.quality-table th,.quality-table td { border-bottom:1px solid rgba(23,43,42,.12); padding:16px 12px; text-align:right; }
+.quality-table th:first-child,.quality-table td:first-child { text-align:left; }
+.quality-table thead th { color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+.quality-table tbody th { color:var(--burgundy); font:700 17px 'Space Grotesk'; }
+.quality-table tbody td { color:var(--ink); font:600 22px 'Space Grotesk'; }
 .size-delay-heading { margin:52px 0 0; }
 .submission-chart-wrap { height:min(56vw,460px); min-height:340px; margin-top:28px; }
 .delays-block { padding-bottom:70px; }

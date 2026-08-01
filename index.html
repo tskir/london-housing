@@ -55,6 +55,11 @@
         <div class="chart-wrap"><canvas id="completeness-chart" aria-label="Line chart showing the percentage of residential records with submission, approval and construction start dates by year"></canvas></div>
         <p class="definition">Units is the default: units in records with all three dates divided by all started residential units. Applications shows the original record-weighted measure: records with all three dates divided by all started applications.</p>
       </section>
+      <section class="card data-quality-card">
+        <div class="card-heading"><div><p class="eyebrow">Data quality by status</p><h3>Which dates are actually recorded?</h3></div><p class="hint">Unit-weighted · 2000–2025</p></div>
+        <div class="quality-table-wrap"><table class="quality-table"><thead><tr><th scope="col">Status</th><th scope="col">Approved date</th><th scope="col">Commenced date</th><th scope="col">Completed date</th></tr></thead><tbody id="data-quality-body"></tbody></table></div>
+        <p class="definition">Each percentage is the share of proposed residential units in that status whose corresponding API date is present. The denominator is all residential submissions with <code>valid_date</code> from 2000–2025, not only applications that eventually started construction.</p>
+      </section>
     </section>
 
     <section class="story-block delays-block">
@@ -100,6 +105,7 @@
           <tbody>
             <tr><td>Units started</td><td><code>actual_commencement_date</code><br><code>total_no_proposed_residential_units</code></td><td>Sum proposed units by construction-start year.</td></tr>
             <tr><td>Completeness</td><td><code>valid_date</code><br><code>decision_date</code><br><code>actual_commencement_date</code></td><td>Records with all three non-empty dates ÷ all records started that year.</td></tr>
+            <tr><td>Date quality by status</td><td><code>status</code><br><code>decision_date</code><br><code>actual_commencement_date</code><br><code>actual_completion_date</code></td><td>For Approved, Commenced and Completed statuses, proposed units with each date present ÷ all proposed units in that status, using 2000–2025 submissions.</td></tr>
             <tr><td>Council delay</td><td><code>valid_date</code> → <code>decision_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Developer delay</td><td><code>decision_date</code> → <code>actual_commencement_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Size-split delays</td><td>Residential units + the three dates</td><td>Unit mode sorts delays by month and finds the point where cumulative proposed units reaches 50% of all units in the band. Applications mode uses the ordinary median, where each application counts once. Both are split into 1–5, 6–50, 51–200, 201–500 and 501+ units.</td></tr>

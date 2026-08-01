@@ -12,6 +12,9 @@
   "_source": [
     "status",
     "valid_date",
+    "decision_date",
+    "actual_commencement_date",
+    "actual_completion_date",
     "application_details.residential_details.total_no_proposed_residential_units"
   ]
 }

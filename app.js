@@ -117,6 +117,37 @@ function makeCompletenessChart(data, mode = 'units') {
   else { completenessChart.data.datasets[0].data = values; completenessChart.options.scales.y.title.text = title; completenessChart.update('none'); }
 }
 
+function makeDataQualityTable(records) {
+  const fields = [
+    ['decision_date', 'approved'],
+    ['actual_commencement_date', 'commenced'],
+    ['actual_completion_date', 'completed']
+  ];
+  const rows = new Map(['Approved', 'Commenced', 'Completed'].map(label => [label, {units:0, approved:0, commenced:0, completed:0}]));
+  for (const record of records) {
+    const row = rows.get(statusLabel(record.status));
+    if (!row) continue;
+    const units = record.application_details?.residential_details?.total_no_proposed_residential_units || 0;
+    row.units += units;
+    for (const [field, key] of fields) if (parseDate(record[field])) row[key] += units;
+  }
+  const body = document.querySelector('#data-quality-body');
+  body.replaceChildren();
+  for (const [label, row] of rows) {
+    const tableRow = document.createElement('tr');
+    const statusCell = document.createElement('th');
+    statusCell.scope = 'row';
+    statusCell.textContent = label;
+    tableRow.append(statusCell);
+    for (const [, key] of fields) {
+      const cell = document.createElement('td');
+      cell.textContent = row.units ? `${(row[key] / row.units * 100).toFixed(1)}%` : '—';
+      tableRow.append(cell);
+    }
+    body.append(tableRow);
+  }
+}
+
 let councilChart;
 let developerChart;
 function makeDelayCharts(data, mode = 'units') {
@@ -258,6 +289,7 @@ const data = aggregate(window.DATA.records, window.DATA.submission_records || wi
 const values = key => data.years.map(year => data.byYear.get(year)[key]);
 makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential units started', true);
 makeCompletenessChart(data);
+makeDataQualityTable(window.DATA.submission_records || window.DATA.records);
 makeDelayCharts(data);
 makeSizeDelayCharts(data);
 makeSubmissionChart(data);
