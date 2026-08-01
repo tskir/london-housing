@@ -248,7 +248,7 @@ function makeStatusCloud(records) {
   const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   const cloud = document.querySelector('#status-cloud');
   cloud.replaceChildren();
-  cloud.style.height = `${Math.max(720, entries.length * 18)}px`;
+  cloud.style.height = `${Math.max(620, entries.length * 14)}px`;
   const low = Math.log10(entries[entries.length - 1][1]);
   const high = Math.log10(entries[0][1]);
   const words = [];
