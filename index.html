@@ -51,37 +51,45 @@
       <h2>But how much of<br><em>the pipeline is visible?</em></h2>
       <p class="section-lede">A delay can only be measured when all three dates are recorded. This is the share of started-residential records with a submission date, an approval date and a construction-start date.</p>
       <section class="card chart-card">
-        <div class="card-heading"><div><p class="eyebrow">Data completeness</p><h3>Records with all three dates</h3></div><p class="hint">Share of records, by construction-start year.</p></div>
+        <div class="card-heading"><div><p class="eyebrow">Data completeness</p><h3>Records with all three dates</h3></div><div><div class="chart-toggle" role="group" aria-label="Completeness denominator"><button type="button" class="active" data-completeness-mode="units" aria-pressed="true">Units</button><button type="button" data-completeness-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Share with all three dates, by construction-start year.</p></div></div>
         <div class="chart-wrap"><canvas id="completeness-chart" aria-label="Line chart showing the percentage of residential records with submission, approval and construction start dates by year"></canvas></div>
-        <p class="definition">The denominator is every allowed residential record with a recorded construction start in that year. The numerator has all three dates needed for both delays.</p>
+        <p class="definition">Units is the default: units in records with all three dates divided by all started residential units. Applications shows the original record-weighted measure: records with all three dates divided by all started applications.</p>
       </section>
     </section>
 
     <section class="story-block delays-block">
       <p class="section-number">04 / The measured delays</p>
       <h2>Where the records are complete,<br><em>the wait looks like this.</em></h2>
-      <p class="section-lede">These plots use only records where all three dates are present. Medians show the typical wait without letting unusually long cases dominate the story.</p>
+      <p class="section-lede">These plots use only records where all three dates are present. From 2018 onwards, at least 20% of applications have those three dates. Choose whether each application counts once, or whether larger residential developments carry more weight.</p>
+      <div class="card-heading delay-heading"><div><p class="eyebrow">2018–2025 · both delays by year</p></div><div class="chart-toggle" role="group" aria-label="Delay weighting"><button type="button" class="active" data-delay-mode="units" aria-pressed="true">Units</button><button type="button" data-delay-mode="applications" aria-pressed="false">Applications</button></div></div>
       <div class="delay-grid">
-        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Council delay</p><h3>Submission to approval</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="council-chart" aria-label="Line chart showing median council delay in months by year"></canvas></div></section>
-        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="developer-chart" aria-label="Line chart showing median developer delay in months by year"></canvas></div></section>
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Council delay</p><h3>Submission to approval</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="council-chart" aria-label="Line chart showing median council delay in months by year from 2018 to 2025"></canvas></div></section>
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="developer-chart" aria-label="Line chart showing median developer delay in months by year from 2018 to 2025"></canvas></div></section>
       </div>
+      <p class="definition">Units weights each delay by the number of proposed residential units in the application. Applications gives each application one vote. Both modes use the median and exclude negative date intervals.</p>
     </section>
 
-    <section class="story-block scale-block">
-      <p class="section-number">05 / The scale</p>
-      <h2>So, everything is all right?<br><em>There is no problem with approval dates.</em></h2>
-      <p class="section-lede">Not so fast. Most applications in this dataset are small projects—often a single home or a two-home garden extension. The shape of the application data matters when we read the delays.</p>
-      <section class="card chart-card">
-        <div class="card-heading"><div><p class="eyebrow">Application size</p><h3>How many units does a project propose?</h3></div><p class="hint">Number of applications, by proposed units.</p></div>
-        <div class="chart-wrap"><canvas id="size-chart" aria-label="Bar chart showing the distribution of proposed residential units per application"></canvas></div>
-        <p class="definition">This counts applications, not homes. A 1-unit extension and a 200-unit development each count once here.</p>
-      </section>
-      <div class="delay-grid size-delay-grid">
-        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Council delay by project size</p><h3>Submission to approval</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="size-council-chart" aria-label="Line chart showing median council delay by application size and year"></canvas></div></section>
-        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay by project size</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="size-developer-chart" aria-label="Line chart showing median developer delay by application size and year"></canvas></div></section>
+    <details class="methodology">
+      <summary>Show methodology</summary>
+      <div class="methodology-content">
+      <p class="section-number">05 / Data and method</p>
+      <h2>One source.<br><em>Clear calculations.</em></h2>
+      <p class="section-lede">Every view uses the same pre-downloaded residential application snapshot. No graph queries a separate dataset.</p>
+      <div class="endpoint"><strong>Primary query</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/applications/_search?scroll=1m</code><strong>Next pages</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/_search/scroll</code></div>
+      <p class="method-note">The snapshot includes only records where <code>status.raw</code> is <code>Completed</code> or <code>Commenced</code>, proposed residential units are greater than zero, and <code>actual_commencement_date</code> falls between 2000 and 2025. The browser calculates all measures from the returned fields.</p>
+      <div class="method-table-wrap">
+        <table class="method-table">
+          <thead><tr><th>View</th><th>Fields</th><th>Calculation</th></tr></thead>
+          <tbody>
+            <tr><td>Units started</td><td><code>actual_commencement_date</code><br><code>total_no_proposed_residential_units</code></td><td>Sum proposed units by construction-start year.</td></tr>
+            <tr><td>Completeness</td><td><code>valid_date</code><br><code>decision_date</code><br><code>actual_commencement_date</code></td><td>Records with all three non-empty dates ÷ all records started that year.</td></tr>
+            <tr><td>Council delay</td><td><code>valid_date</code> → <code>decision_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
+            <tr><td>Developer delay</td><td><code>decision_date</code> → <code>actual_commencement_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
+          </tbody>
+        </table>
       </div>
-      <p class="definition size-note">Each line groups applications by proposed residential units: 1, 2–5, 6–20, 21–50, 51–200, and 201+.</p>
-    </section>
+      </div>
+    </details>
 
     <footer>Source: <a href="https://planninglondondatahub.london.gov.uk/" target="_blank" rel="noreferrer">Planning London Datahub</a></footer>
   </main>

@@ -33,4 +33,4 @@ If the link returns 404, enable Pages once in the repository: **Settings → Pag
 
 The app loads Chart.js from jsDelivr, so the chart needs an internet connection.
 
-The final section breaks applications into six residential-unit bands—1, 2–5, 6–20, 21–50, 51–200 and 201+—and compares the median council and developer delays for each band.
+The completeness chart defaults to a unit-weighted percentage: units in complete records divided by all started units. A toggle retains the application-weighted version. The delay charts begin in 2018, when at least 20% of applications have the three required dates. Delay charts default to unit-weighted medians, with an application-weighted toggle.
