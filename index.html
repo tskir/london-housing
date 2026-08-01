@@ -67,6 +67,22 @@
       </div>
     </section>
 
+    <section class="story-block scale-block">
+      <p class="section-number">05 / The scale</p>
+      <h2>So, everything is all right?<br><em>There is no problem with approval dates.</em></h2>
+      <p class="section-lede">Not so fast. Most applications in this dataset are small projects—often a single home or a two-home garden extension. The shape of the application data matters when we read the delays.</p>
+      <section class="card chart-card">
+        <div class="card-heading"><div><p class="eyebrow">Application size</p><h3>How many units does a project propose?</h3></div><p class="hint">Number of applications, by proposed units.</p></div>
+        <div class="chart-wrap"><canvas id="size-chart" aria-label="Bar chart showing the distribution of proposed residential units per application"></canvas></div>
+        <p class="definition">This counts applications, not homes. A 1-unit extension and a 200-unit development each count once here.</p>
+      </section>
+      <div class="delay-grid size-delay-grid">
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Council delay by project size</p><h3>Submission to approval</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="size-council-chart" aria-label="Line chart showing median council delay by application size and year"></canvas></div></section>
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay by project size</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="size-developer-chart" aria-label="Line chart showing median developer delay by application size and year"></canvas></div></section>
+      </div>
+      <p class="definition size-note">Each line groups applications by proposed residential units: 1, 2–5, 6–20, 21–50, 51–200, and 201+.</p>
+    </section>
+
     <footer>Source: <a href="https://planninglondondatahub.london.gov.uk/" target="_blank" rel="noreferrer">Planning London Datahub</a></footer>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>

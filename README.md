@@ -32,3 +32,5 @@ Open <http://localhost:8000>.
 If the link returns 404, enable Pages once in the repository: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` → Folder: `/ (root)`**.
 
 The app loads Chart.js from jsDelivr, so the chart needs an internet connection.
+
+The final section breaks applications into six residential-unit bands—1, 2–5, 6–20, 21–50, 51–200 and 201+—and compares the median council and developer delays for each band.
