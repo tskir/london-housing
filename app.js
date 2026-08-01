@@ -30,7 +30,7 @@ function median(values) { const sorted = values.slice().sort((a,b) => a - b); co
 function aggregate(records) {
   const years = Array.from({length:maxYear - minYear + 1}, (_, i) => minYear + i);
   const delayYears = Array.from({length:maxYear - delayMinYear + 1}, (_, i) => delayMinYear + i);
-  const byYear = new Map(years.map(year => [year, {homes:0, records:0, complete:0, council:[], developer:[]}]));
+  const byYear = new Map(years.map(year => [year, {homes:0, records:0, complete:0, completeHomes:0, council:[], developer:[]}]));
   const unitValues = [];
   const sizeByYear = sizeBands.map(() => new Map(years.map(year => [year, {council:[], developer:[]}] )));
   for (const record of records) {
@@ -47,6 +47,7 @@ function aggregate(records) {
     const approved = parseDate(record.decision_date);
     if (!submitted || !approved) continue;
     row.complete++;
+    row.completeHomes += units;
     const councilDelay = monthsBetween(submitted, approved);
     const developerDelay = monthsBetween(approved, actual);
     if (councilDelay >= 0) row.council.push(councilDelay);
@@ -68,6 +69,23 @@ function makeLineChart(id, labels, values, color, yTitle, fill = false) {
   return chart;
 }
 
+let completenessChart;
+function makeCompletenessChart(data, mode = 'units') {
+  const units = mode === 'units';
+  const values = data.years.map(year => {
+    const row = data.byYear.get(year);
+    const denominator = units ? row.homes : row.records;
+    const numerator = units ? row.completeHomes : row.complete;
+    return denominator ? numerator / denominator * 100 : null;
+  });
+  if (!completenessChart) completenessChart = makeLineChart('completeness-chart', data.years, values, green, units ? 'Records with all three dates · % of units' : 'Records with all three dates · % of applications');
+  else {
+    completenessChart.data.datasets[0].data = values;
+    completenessChart.options.scales.y.title.text = units ? 'Records with all three dates · % of units' : 'Records with all three dates · % of applications';
+    completenessChart.update('none');
+  }
+}
+
 function makeSizeHistogram(data) {
   const max = Math.max(...data.unitValues);
   const binCount = 30;
@@ -85,10 +103,14 @@ function makeSizeDelayChart(data, id, key, title) {
 const data = aggregate(window.DATA.records);
 const values = key => data.years.map(year => data.byYear.get(year)[key]);
 makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential units started', true);
-makeLineChart('completeness-chart', data.years, data.years.map(year => data.byYear.get(year).complete / data.byYear.get(year).records * 100), green, 'Records with all three dates (%)');
+makeCompletenessChart(data);
 makeLineChart('council-chart', data.delayYears, data.delayYears.map(year => data.byYear.get(year).council.length ? median(data.byYear.get(year).council) : null), burgundy, 'Median months');
 makeLineChart('developer-chart', data.delayYears, data.delayYears.map(year => data.byYear.get(year).developer.length ? median(data.byYear.get(year).developer) : null), green, 'Median months');
 makeSizeHistogram(data);
 makeSizeDelayChart(data, 'size-council-chart', 'council', 'Median months');
 makeSizeDelayChart(data, 'size-developer-chart', 'developer', 'Median months');
+document.querySelectorAll('[data-completeness-mode]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-completeness-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
+  makeCompletenessChart(data, button.dataset.completenessMode);
+}));
 status.textContent = `${window.DATA.records.length.toLocaleString()} completed or commenced residential records · starts 2000–2025 · pre-downloaded API data`;

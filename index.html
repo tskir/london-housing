@@ -51,9 +51,9 @@
       <h2>But how much of<br><em>the pipeline is visible?</em></h2>
       <p class="section-lede">A delay can only be measured when all three dates are recorded. This is the share of started-residential records with a submission date, an approval date and a construction-start date.</p>
       <section class="card chart-card">
-        <div class="card-heading"><div><p class="eyebrow">Data completeness</p><h3>Records with all three dates</h3></div><p class="hint">Share of records, by construction-start year.</p></div>
+        <div class="card-heading"><div><p class="eyebrow">Data completeness</p><h3>Records with all three dates</h3></div><div><div class="chart-toggle" role="group" aria-label="Completeness denominator"><button type="button" class="active" data-completeness-mode="units" aria-pressed="true">Units</button><button type="button" data-completeness-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Share with all three dates, by construction-start year.</p></div></div>
         <div class="chart-wrap"><canvas id="completeness-chart" aria-label="Line chart showing the percentage of residential records with submission, approval and construction start dates by year"></canvas></div>
-        <p class="definition">The denominator is every allowed residential record with a recorded construction start in that year. The numerator has all three dates needed for both delays.</p>
+        <p class="definition">Units is the default: units in records with all three dates divided by all started residential units. Applications shows the original record-weighted measure: records with all three dates divided by all started applications.</p>
       </section>
     </section>
 

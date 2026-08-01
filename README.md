@@ -33,4 +33,4 @@ If the link returns 404, enable Pages once in the repository: **Settings → Pag
 
 The app loads Chart.js from jsDelivr, so the chart needs an internet connection.
 
-The delay charts begin in 2018, when at least 20% of applications have the three required dates. The final section shows a log-spaced histogram of the full proposed-unit distribution, then breaks applications into five residential-unit bands—1–5, 6–50, 51–200, 201–500 and 501+—to compare median council and developer delays.
+The completeness chart defaults to a unit-weighted percentage: units in complete records divided by all started units. A toggle retains the application-weighted version. The delay charts begin in 2018, when at least 20% of applications have the three required dates. The final section shows a log-spaced histogram of the full proposed-unit distribution, then breaks applications into five residential-unit bands—1–5, 6–50, 51–200, 201–500 and 501+—to compare median council and developer delays.
