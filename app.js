@@ -2,6 +2,7 @@ const status = document.querySelector('#status');
 const burgundy = '#7b2638';
 const green = '#759b8d';
 const minYear = 2000;
+const delayMinYear = 2018;
 const maxYear = 2025;
 const sizeBands = [
   {label:'1 unit', min:1, max:1},
@@ -29,6 +30,7 @@ function median(values) { const sorted = values.slice().sort((a,b) => a - b); co
 
 function aggregate(records) {
   const years = Array.from({length:maxYear - minYear + 1}, (_, i) => minYear + i);
+  const delayYears = Array.from({length:maxYear - delayMinYear + 1}, (_, i) => delayMinYear + i);
   const byYear = new Map(years.map(year => [year, {homes:0, records:0, complete:0, council:[], developer:[]}]));
   const sizeCounts = sizeBands.map(() => 0);
   const sizeByYear = sizeBands.map(() => new Map(years.map(year => [year, {council:[], developer:[]}] )));
@@ -55,7 +57,7 @@ function aggregate(records) {
       if (developerDelay >= 0) sizeByYear[sizeIndex].get(year).developer.push(developerDelay);
     }
   }
-  return {years, byYear, sizeCounts, sizeByYear};
+  return {years, delayYears, byYear, sizeCounts, sizeByYear};
 }
 
 function chartOptions(yTitle, yFormat = value => Number(value).toLocaleString(), showLegend = false) {
@@ -72,16 +74,16 @@ function makeSizeHistogram(data) {
 }
 
 function makeSizeDelayChart(data, id, key, title) {
-  const datasets = sizeBands.map((band, index) => ({label:band.label,data:data.years.map(year => { const values=data.sizeByYear[index].get(year)[key]; return values.length ? median(values) : null; }),borderColor:sizeColors[index],backgroundColor:sizeColors[index],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}));
-  new Chart(document.querySelector(`#${id}`), {type:'line',data:{labels:data.years,datasets},options:chartOptions(title, value => Number(value).toFixed(0), true)});
+  const datasets = sizeBands.map((band, index) => ({label:band.label,data:data.delayYears.map(year => { const values=data.sizeByYear[index].get(year)[key]; return values.length ? median(values) : null; }),borderColor:sizeColors[index],backgroundColor:sizeColors[index],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}));
+  new Chart(document.querySelector(`#${id}`), {type:'line',data:{labels:data.delayYears,datasets},options:chartOptions(title, value => Number(value).toFixed(0), true)});
 }
 
 const data = aggregate(window.DATA.records);
 const values = key => data.years.map(year => data.byYear.get(year)[key]);
 makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential units started', true);
 makeLineChart('completeness-chart', data.years, data.years.map(year => data.byYear.get(year).complete / data.byYear.get(year).records * 100), green, 'Records with all three dates (%)');
-makeLineChart('council-chart', data.years, data.years.map(year => data.byYear.get(year).council.length ? median(data.byYear.get(year).council) : null), burgundy, 'Median months');
-makeLineChart('developer-chart', data.years, data.years.map(year => data.byYear.get(year).developer.length ? median(data.byYear.get(year).developer) : null), green, 'Median months');
+makeLineChart('council-chart', data.delayYears, data.delayYears.map(year => data.byYear.get(year).council.length ? median(data.byYear.get(year).council) : null), burgundy, 'Median months');
+makeLineChart('developer-chart', data.delayYears, data.delayYears.map(year => data.byYear.get(year).developer.length ? median(data.byYear.get(year).developer) : null), green, 'Median months');
 makeSizeHistogram(data);
 makeSizeDelayChart(data, 'size-council-chart', 'council', 'Median months');
 makeSizeDelayChart(data, 'size-developer-chart', 'developer', 'Median months');
