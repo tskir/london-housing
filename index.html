@@ -78,11 +78,11 @@
     <section class="story-block submissions-block">
       <p class="section-number">05 / The record behind the record</p>
       <h2>When did these applications<br><em>enter the council pipeline?</em></h2>
-      <p class="section-lede">This widens the lens beyond construction starts: every residential application submitted in 2020–2025 appears here, including refused, withdrawn and not-yet-commenced applications.</p>
+      <p class="section-lede">This widens the lens beyond construction starts: every residential application submitted in 2000–2025 appears here, including refused, withdrawn and not-yet-commenced applications.</p>
       <section class="card chart-card">
-        <div class="card-heading"><div><p class="eyebrow">2020–2025 · year submitted to council</p><h3>Submitted applications, by status</h3></div><div><div class="chart-toggle" role="group" aria-label="Submission chart measure"><button type="button" class="active" data-submission-mode="units" aria-pressed="true">Units</button><button type="button" data-submission-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Stacked by every API status.</p></div></div>
-        <div class="submission-chart-wrap"><canvas id="submission-chart" aria-label="Stacked bar chart showing residential units submitted to council by year and every application status from 2020 to 2025"></canvas></div>
-        <p class="definition">Units counts the proposed residential units in each application. Applications counts each application once. Unlike the earlier sections, this chart uses all statuses returned by the API, not only <code>Completed</code> and <code>Commenced</code>.</p>
+        <div class="card-heading"><div><p class="eyebrow">2000–2025 · year submitted to council</p><h3>Submitted applications, by status</h3></div><div><div class="chart-toggle" role="group" aria-label="Submission chart measure"><button type="button" class="active" data-submission-mode="units" aria-pressed="true">Units</button><button type="button" data-submission-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Top five statuses; all others are Other.</p></div></div>
+        <div class="submission-chart-wrap"><canvas id="submission-chart" aria-label="Stacked bar chart showing residential units submitted to council by year and the five most common application statuses from 2000 to 2025"></canvas></div>
+        <p class="definition">Units counts the proposed residential units in each application. Applications counts each application once. The five named statuses are the most common by application count across 2000–2025; every remaining API status is grouped into <strong>Other</strong>. Unlike the earlier sections, this uses all statuses, not only <code>Completed</code> and <code>Commenced</code>.</p>
       </section>
     </section>
 
@@ -93,7 +93,7 @@
       <h2>One source.<br><em>Clear calculations.</em></h2>
       <p class="section-lede">Every view uses the same pre-downloaded residential application snapshot. No graph queries a separate dataset.</p>
       <div class="endpoint"><strong>Primary query</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/applications/_search?scroll=1m</code><strong>Next pages</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/_search/scroll</code></div>
-      <p class="method-note">The main snapshot includes only records where <code>status.raw</code> is <code>Completed</code> or <code>Commenced</code>, proposed residential units are greater than zero, and <code>actual_commencement_date</code> falls between 2000 and 2025. The submission chart uses a separate residential-only query for all statuses with <code>valid_date</code> in 2020–2025. The browser calculates all measures from the returned fields.</p>
+      <p class="method-note">The main snapshot includes only records where <code>status.raw</code> is <code>Completed</code> or <code>Commenced</code>, proposed residential units are greater than zero, and <code>actual_commencement_date</code> falls between 2000 and 2025. The submission chart uses a separate residential-only query for all statuses with <code>valid_date</code> in 2000–2025. The browser calculates all measures from the returned fields.</p>
       <div class="method-table-wrap">
         <table class="method-table">
           <thead><tr><th>View</th><th>Fields</th><th>Calculation</th></tr></thead>
@@ -103,7 +103,7 @@
             <tr><td>Council delay</td><td><code>valid_date</code> → <code>decision_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Developer delay</td><td><code>decision_date</code> → <code>actual_commencement_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Size-split delays</td><td>Residential units + the three dates</td><td>Unit mode sorts delays by month and finds the point where cumulative proposed units reaches 50% of all units in the band. Applications mode uses the ordinary median, where each application counts once. Both are split into 1–5, 6–50, 51–200, 201–500 and 501+ units.</td></tr>
-            <tr><td>Submission status</td><td><code>valid_date</code><br><code>status</code><br><code>total_no_proposed_residential_units</code></td><td>Separate all-status query: sum units, or count applications, by submission year and API status for 2020–2025.</td></tr>
+            <tr><td>Submission status</td><td><code>valid_date</code><br><code>status</code><br><code>total_no_proposed_residential_units</code></td><td>Separate all-status query: sum units, or count applications, by submission year for 2000–2025. The five most common statuses by application count are shown separately; all others are grouped as Other.</td></tr>
           </tbody>
         </table>
       </div>

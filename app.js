@@ -3,7 +3,7 @@ const burgundy = '#7b2638';
 const green = '#759b8d';
 const minYear = 2000;
 const delayMinYear = 2018;
-const submissionMinYear = 2020;
+const submissionMinYear = 2000;
 const maxYear = 2025;
 const sizeBands = [
   {label:'1–5 units', min:1, max:5},
@@ -66,7 +66,7 @@ function aggregate(records, submissionRecords) {
       if (developerDelay >= 0) sizeRow.developer.push({value:developerDelay, weight:units});
     }
   }
-  const submissionStatuses = new Set();
+  const submissionTotals = new Map();
   for (const record of submissionRecords) {
     const submittedYear = parseDate(record.valid_date)?.getUTCFullYear();
     if (submittedYear < submissionMinYear || submittedYear > maxYear) continue;
@@ -77,15 +77,20 @@ function aggregate(records, submissionRecords) {
     current.units += units;
     current.applications++;
     statusRow.set(label, current);
-    submissionStatuses.add(label);
+    submissionTotals.set(label, (submissionTotals.get(label) || 0) + 1);
   }
-  const preferredStatusOrder = ['Completed', 'Commenced'];
-  const statuses = [...submissionStatuses].sort((a, b) => {
-    const aIndex = preferredStatusOrder.indexOf(a);
-    const bIndex = preferredStatusOrder.indexOf(b);
-    return (aIndex < 0 ? preferredStatusOrder.length : aIndex) - (bIndex < 0 ? preferredStatusOrder.length : bIndex) || a.localeCompare(b);
-  });
-  return {years, delayYears, submissionYears, byYear, sizeByYear, submissionByYear, statuses};
+  const statuses = [...submissionTotals.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5).map(([label]) => label);
+  const groupedSubmissionByYear = new Map(submissionYears.map(year => {
+    const grouped = new Map(statuses.concat('Other').map(label => [label, {units:0, applications:0}]));
+    for (const [label, values] of submissionByYear.get(year)) {
+      const group = statuses.includes(label) ? label : 'Other';
+      const current = grouped.get(group);
+      current.units += values.units;
+      current.applications += values.applications;
+    }
+    return [year, grouped];
+  }));
+  return {years, delayYears, submissionYears, byYear, sizeByYear, submissionByYear:groupedSubmissionByYear, statuses:statuses.concat('Other')};
 }
 
 function chartOptions(yTitle, yFormat = value => Number(value).toLocaleString(), showLegend = false) {
@@ -164,7 +169,7 @@ function makeSizeDelayCharts(data, mode = 'units') {
   });
 }
 
-const statusColors = {Completed:burgundy, Commenced:green, Refused:'#d36b52', Withdrawn:'#a67c52', Pending:'#527f91'};
+const statusColors = {Completed:burgundy, Commenced:green, Refused:'#d36b52', Withdrawn:'#a67c52', Pending:'#527f91', Other:'#9aaba4'};
 const statusPalette = ['#7b2638','#759b8d','#d36b52','#a67c52','#527f91','#8d789e','#9aaba4'];
 let submissionChart;
 function makeSubmissionChart(data, mode = 'units') {

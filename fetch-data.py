@@ -3,6 +3,8 @@
 
 import json
 import os
+import time
+from urllib.error import HTTPError
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -12,11 +14,17 @@ API_KEY = os.environ.get('PLD_API_KEY', 'be2rmRnt&')
 
 def request(url, payload):
     body = json.dumps(payload).encode()
-    response = urlopen(Request(url, data=body, headers={
-        'Content-Type': 'application/json',
-        'X-API-AllowRequest': API_KEY,
-    }))
-    return json.load(response)
+    for attempt in range(4):
+        try:
+            response = urlopen(Request(url, data=body, headers={
+                'Content-Type': 'application/json',
+                'X-API-AllowRequest': API_KEY,
+            }), timeout=60)
+            return json.load(response)
+        except HTTPError as error:
+            if error.code != 503 or attempt == 3:
+                raise
+            time.sleep(2 ** attempt)
 
 
 def fetch_all(query):
