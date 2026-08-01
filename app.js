@@ -35,14 +35,13 @@ function weightedMedian(values) {
 }
 function delayMedian(values, mode) { return mode === 'units' ? weightedMedian(values) : median(values.map(item => item.value)); }
 
-function aggregate(records) {
+function aggregate(records, submissionRecords) {
   const years = Array.from({length:maxYear - minYear + 1}, (_, i) => minYear + i);
   const delayYears = Array.from({length:maxYear - delayMinYear + 1}, (_, i) => delayMinYear + i);
   const submissionYears = Array.from({length:maxYear - submissionMinYear + 1}, (_, i) => submissionMinYear + i);
   const byYear = new Map(years.map(year => [year, {homes:0, records:0, complete:0, completeHomes:0, council:[], developer:[]}]));
   const sizeByYear = sizeBands.map(() => new Map(delayYears.map(year => [year, {council:[], developer:[]}])));
   const submissionByYear = new Map(submissionYears.map(year => [year, new Map()]));
-  const submissionStatuses = new Set();
   for (const record of records) {
     const actual = parseDate(record.actual_commencement_date);
     const year = actual?.getUTCFullYear();
@@ -53,16 +52,6 @@ function aggregate(records) {
     row.records++;
     row.homes += units;
     const submitted = parseDate(record.valid_date);
-    const submittedYear = submitted?.getUTCFullYear();
-    if (submittedYear >= submissionMinYear && submittedYear <= maxYear) {
-      const label = String(record.status || 'Unknown');
-      const statusRow = submissionByYear.get(submittedYear);
-      const current = statusRow.get(label) || {units:0, applications:0};
-      current.units += units;
-      current.applications++;
-      statusRow.set(label, current);
-      submissionStatuses.add(label);
-    }
     const approved = parseDate(record.decision_date);
     if (!submitted || !approved) continue;
     row.complete++;
@@ -76,6 +65,19 @@ function aggregate(records) {
       if (councilDelay >= 0) sizeRow.council.push({value:councilDelay, weight:units});
       if (developerDelay >= 0) sizeRow.developer.push({value:developerDelay, weight:units});
     }
+  }
+  const submissionStatuses = new Set();
+  for (const record of submissionRecords) {
+    const submittedYear = parseDate(record.valid_date)?.getUTCFullYear();
+    if (submittedYear < submissionMinYear || submittedYear > maxYear) continue;
+    const units = record.application_details?.residential_details?.total_no_proposed_residential_units || 0;
+    const label = String(record.status || 'Unknown');
+    const statusRow = submissionByYear.get(submittedYear);
+    const current = statusRow.get(label) || {units:0, applications:0};
+    current.units += units;
+    current.applications++;
+    statusRow.set(label, current);
+    submissionStatuses.add(label);
   }
   const preferredStatusOrder = ['Completed', 'Commenced'];
   const statuses = [...submissionStatuses].sort((a, b) => {
@@ -162,14 +164,15 @@ function makeSizeDelayCharts(data, mode = 'units') {
   });
 }
 
-const statusColors = {Completed:burgundy, Commenced:green};
+const statusColors = {Completed:burgundy, Commenced:green, Refused:'#d36b52', Withdrawn:'#a67c52', Pending:'#527f91'};
+const statusPalette = ['#7b2638','#759b8d','#d36b52','#a67c52','#527f91','#8d789e','#9aaba4'];
 let submissionChart;
 function makeSubmissionChart(data, mode = 'units') {
   const measure = mode === 'units' ? 'Residential units' : 'Applications';
-  const datasets = data.statuses.map(label => ({
+  const datasets = data.statuses.map((label, index) => ({
     label,
     data: data.submissionYears.map(year => data.submissionByYear.get(year).get(label)?.[mode] || 0),
-    backgroundColor: statusColors[label] || '#9aaba4',
+    backgroundColor: statusColors[label] || statusPalette[index % statusPalette.length],
     borderWidth: 0
   }));
   if (!submissionChart) {
@@ -181,7 +184,7 @@ function makeSubmissionChart(data, mode = 'units') {
   }
 }
 
-const data = aggregate(window.DATA.records);
+const data = aggregate(window.DATA.records, window.DATA.submission_records || window.DATA.records);
 const values = key => data.years.map(year => data.byYear.get(year)[key]);
 makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential units started', true);
 makeCompletenessChart(data);
@@ -195,10 +198,13 @@ document.querySelectorAll('[data-completeness-mode]').forEach(button => button.a
 document.querySelectorAll('[data-delay-mode]').forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('[data-delay-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
   makeDelayCharts(data, button.dataset.delayMode);
-  makeSizeDelayCharts(data, button.dataset.delayMode);
+}));
+document.querySelectorAll('[data-size-delay-mode]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-size-delay-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
+  makeSizeDelayCharts(data, button.dataset.sizeDelayMode);
 }));
 document.querySelectorAll('[data-submission-mode]').forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('[data-submission-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
   makeSubmissionChart(data, button.dataset.submissionMode);
 }));
-status.textContent = `${window.DATA.records.length.toLocaleString()} completed or commenced residential records · starts 2000–2025 · pre-downloaded API data`;
+status.textContent = `${window.DATA.records.length.toLocaleString()} completed or commenced residential records · ${window.DATA.submission_records?.length.toLocaleString() || window.DATA.records.length.toLocaleString()} all-status submissions · pre-downloaded API data`;

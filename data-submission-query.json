@@ -1,0 +1,17 @@
+{
+  "size": 10000,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        { "range": { "application_details.residential_details.total_no_proposed_residential_units": { "gt": 0 } } },
+        { "range": { "valid_date": { "gte": "01/01/2020", "lte": "31/12/2025" } } }
+      ]
+    }
+  },
+  "_source": [
+    "status",
+    "valid_date",
+    "application_details.residential_details.total_no_proposed_residential_units"
+  ]
+}
