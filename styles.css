@@ -45,6 +45,11 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 .delays-block { padding-bottom:70px; }
 .delay-heading { margin-top:30px; }
 .methodology { border-top:1px solid rgba(23,43,42,.14); padding:64px 0 70px; }
+.methodology summary { color:var(--burgundy); cursor:pointer; font:700 15px 'Space Grotesk'; list-style:none; }
+.methodology summary::-webkit-details-marker { display:none; }
+.methodology summary::after { content:'＋'; float:right; font-size:22px; font-weight:400; }
+.methodology[open] summary { margin-bottom:48px; }
+.methodology[open] summary::after { content:'−'; }
 .endpoint { background:var(--ink); border-radius:14px; color:white; display:grid; gap:8px; margin-top:32px; max-width:900px; padding:22px; }
 .endpoint strong { color:var(--mint); font-size:11px; letter-spacing:.12em; text-transform:uppercase; }
 .endpoint code { color:white; overflow-wrap:anywhere; }
