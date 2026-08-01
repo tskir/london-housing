@@ -1,4 +1,3 @@
-const status = document.querySelector('#status');
 const burgundy = '#7b2638';
 const green = '#187a6e';
 const minYear = 2000;
@@ -141,6 +140,7 @@ function makeDataQualityTable(records) {
     tableRow.append(statusCell);
     for (const [, key] of fields) {
       const cell = document.createElement('td');
+      if ((label === 'Approved' && (key === 'commenced' || key === 'completed')) || (label === 'Commenced' && key === 'completed')) cell.className = 'data-bug';
       cell.textContent = row.units ? `${(row[key] / row.units * 100).toFixed(1)}%` : '—';
       tableRow.append(cell);
     }
@@ -328,4 +328,3 @@ document.querySelectorAll('[data-submission-scale]').forEach(button => button.ad
   submissionScale = button.dataset.submissionScale;
   makeSubmissionChart(data, submissionMode, submissionScale);
 }));
-status.textContent = `${window.DATA.records.length.toLocaleString()} completed or commenced residential records · ${window.DATA.submission_records?.length.toLocaleString() || window.DATA.records.length.toLocaleString()} all-status submissions · pre-downloaded API data`;

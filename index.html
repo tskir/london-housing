@@ -16,10 +16,7 @@
       <h1>London's housing pipeline<br><em>is slowing down.</em></h1>
       <p class="intro">A look at the homes that started construction, and the gaps between the planning process and the building site.</p>
     </header>
-    <section class="status" aria-live="polite"><span class="dot"></span><span id="status">Loading bundled data…</span></section>
-
     <section class="story-block">
-      <p class="section-number">01 / The signal</p>
       <h2>Fewer residential units<br><em>are being started.</em></h2>
       <p class="section-lede">The recorded number of residential units entering construction has fallen sharply in recent years. That is the signal. Now we need to understand the pipeline behind it.</p>
       <section class="card chart-card">
@@ -30,7 +27,6 @@
     </section>
 
     <section class="story-block process-block">
-      <p class="section-number">02 / The pipeline</p>
       <h2>Every home passes<br><em>through three dates.</em></h2>
       <p class="section-lede">Before a unit can start construction, it moves from an application to a decision, then from a decision to a building site.</p>
       <div class="timeline">
@@ -47,7 +43,6 @@
     </section>
 
     <section class="story-block caveat-block">
-      <p class="section-number">03 / The caveat</p>
       <h2>But how much of<br><em>the pipeline is visible?</em></h2>
       <p class="section-lede">A delay can only be measured when all three dates are recorded. This is the share of started-residential records with a submission date, an approval date and a construction-start date.</p>
       <section class="card chart-card">
@@ -58,12 +53,11 @@
       <section class="card data-quality-card">
         <div class="card-heading"><div><p class="eyebrow">Data quality by status</p><h3>Which dates are actually recorded?</h3></div><p class="hint">Unit-weighted · 2000–2025</p></div>
         <div class="quality-table-wrap"><table class="quality-table"><thead><tr><th scope="col">Status</th><th scope="col">Approved date</th><th scope="col">Commenced date</th><th scope="col">Completed date</th></tr></thead><tbody id="data-quality-body"></tbody></table></div>
-        <p class="definition">Each percentage is the share of proposed residential units in that status whose corresponding API date is present. The denominator is all residential submissions with <code>valid_date</code> from 2000–2025, not only applications that eventually started construction.</p>
+        <p class="definition">Each percentage is the share of proposed residential units in that status whose corresponding API date is present. The denominator is all residential submissions with <code>valid_date</code> from 2000–2025, not only applications that eventually started construction. Light red cells flag status/date combinations that should normally be absent.</p>
       </section>
     </section>
 
     <section class="story-block delays-block">
-      <p class="section-number">04 / The measured delays</p>
       <h2>Where the records are complete,<br><em>the wait looks like this.</em></h2>
       <p class="section-lede">These plots use only records where all three dates are present. From 2018 onwards, at least 20% of applications have those three dates. Choose whether each application counts once, or whether larger residential developments carry more weight.</p>
       <div class="card-heading delay-heading"><div><p class="eyebrow">2018–2025 · both delays by year</p></div><div class="chart-toggle" role="group" aria-label="Delay weighting"><button type="button" class="active" data-delay-mode="units" aria-pressed="true">Units</button><button type="button" data-delay-mode="applications" aria-pressed="false">Applications</button></div></div>
@@ -81,7 +75,6 @@
     </section>
 
     <section class="story-block submissions-block">
-      <p class="section-number">05 / The record behind the record</p>
       <h2>When did these applications<br><em>enter the council pipeline?</em></h2>
       <p class="section-lede">This widens the lens beyond construction starts: every residential application submitted in 2000–2025 appears here, including refused, withdrawn and not-yet-commenced applications.</p>
       <section class="card chart-card">
@@ -92,7 +85,6 @@
     </section>
 
     <section class="story-block conclusion-block">
-      <p class="section-number">06 / The warning</p>
       <h2>Maybe the fall<br><em>isn't quite as severe.</em></h2>
       <p class="section-lede">The status chart above contains a conspicuous mass of applications submitted in 2020, 2021 and 2022 that are still marked <strong>Approved</strong>.</p>
       <p class="conclusion-text">Under the usual three-year rule, planning permission expires if development has not begun, unless an extension or a different period applies. By now, many of those older approvals would therefore be expected to have commenced, completed or become <strong>Lapsed</strong>.</p>
@@ -100,7 +92,6 @@
     </section>
 
     <section class="story-block status-cloud-block">
-      <p class="section-number">07 / The status soup</p>
       <h2>One application.<br><em>So many answers.</em></h2>
       <p class="section-lede">Every distinct status in the full residential submission dataset appears below. The larger the word, the more often that status occurs.</p>
       <div id="status-cloud" class="status-cloud" role="list" aria-label="All application statuses, sized by number of applications"></div>
@@ -111,7 +102,6 @@
     <details class="methodology">
       <summary>Show methodology</summary>
       <div class="methodology-content">
-      <p class="section-number">08 / Data and method</p>
       <h2>One source.<br><em>Clear calculations.</em></h2>
       <p class="section-lede">Every view uses the same pre-downloaded residential application snapshot. No graph queries a separate dataset.</p>
       <div class="endpoint"><strong>Primary query</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/applications/_search?scroll=1m</code><strong>Next pages</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/_search/scroll</code></div>
