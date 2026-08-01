@@ -10,14 +10,10 @@ Run these commands from the repository root whenever a new API snapshot is neede
 
 ```bash
 api_key='be2rmRnt&'
-
-curl -sS 'https://planninglondondatahub.london.gov.uk/api-guest/applications/_search' \
-  -H "X-API-AllowRequest: $api_key" \
-  -H 'Content-Type: application/json' \
-  --data-binary @data-query.json | sed 's/^/window.DATA = /; s/$/;/' > data.js
+PLD_API_KEY="$api_key" python3 fetch-data.py
 ```
 
-`data-query.json` filters every chart to records with more than zero proposed residential units. It aggregates homes started by year, calculates average lag in months from `actual_commencement_date` minus `application_details.intended_commencement_date`, and counts records with both dates for the completeness table. Records before 1980 are excluded from time series because the API contains malformed historical dates. The API key is the guest key documented in `pld-api.md`.
+`fetch-data.py` uses the API's scroll endpoint to download every record with more than zero proposed residential units, using the fields listed in `data-query.json`. The browser then computes homes started, average lag in months from `actual_commencement_date` minus `application_details.intended_commencement_date`, and completeness percentages locally. Records before 1980 are excluded from time series because the API contains malformed historical dates. The API key is the guest key documented in `pld-api.md`.
 
 After updating `data.js`, commit and push it to publish the new snapshot.
 

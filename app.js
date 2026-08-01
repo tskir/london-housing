@@ -1,8 +1,55 @@
 const status = document.querySelector('#status');
 const burgundy = '#7b2638';
 const grey = '#b4b0aa';
+const minYear = 1980;
+const maxYear = new Date().getUTCFullYear();
 
-const endLabel = { id: 'endLabel', afterDraw(chart) {
+function parseDate(value) {
+  if (!value) return null;
+  const text = String(value);
+  let match = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (match) return new Date(Date.UTC(+match[3], +match[2] - 1, +match[1]));
+  match = text.match(/^(\d{2})\/(\d{4})$/);
+  if (match) return new Date(Date.UTC(+match[2], +match[1] - 1, 1));
+  const date = new Date(text);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function monthsBetween(start, end) { return (end - start) / (1000 * 60 * 60 * 24 * 30.4375); }
+function boroughName(name) { return name.replace(/^London Borough of /, '').replace(/ Council$/, ''); }
+
+function aggregate(records) {
+  const years = Array.from({length:maxYear - minYear + 1}, (_, i) => minYear + i);
+  const totals = new Map(years.map(year => [year, 0]));
+  const boroughs = new Map();
+  for (const record of records) {
+    const borough = boroughName(record.borough || 'Unknown');
+    const units = record.application_details?.residential_details?.total_no_proposed_residential_units || 0;
+    const actual = parseDate(record.actual_commencement_date);
+    const intended = parseDate(record.application_details?.intended_commencement_date);
+    const item = boroughs.get(borough) || { records:0, complete:0, totals:new Map(), lags:new Map() };
+    item.records++;
+    if (actual && intended) {
+      item.complete++;
+      if (actual.getUTCFullYear() >= minYear && actual.getUTCFullYear() <= maxYear) {
+        const year = actual.getUTCFullYear();
+        const lag = item.lags.get(year) || {sum:0, count:0};
+        lag.sum += monthsBetween(intended, actual);
+        lag.count++;
+        item.lags.set(year, lag);
+      }
+    }
+    if (actual && actual.getUTCFullYear() >= minYear && actual.getUTCFullYear() <= maxYear) {
+      const year = actual.getUTCFullYear();
+      totals.set(year, totals.get(year) + units);
+      item.totals.set(year, (item.totals.get(year) || 0) + units);
+    }
+    boroughs.set(borough, item);
+  }
+  return {years, totals, boroughs};
+}
+
+const endLabel = { id:'endLabel', afterDraw(chart) {
   const index = chart.$hoveredDataset;
   if (index === undefined || index < 0) return;
   const dataset = chart.data.datasets[index];
@@ -19,47 +66,34 @@ const endLabel = { id: 'endLabel', afterDraw(chart) {
   context.restore();
 } };
 
-function hoverOptions() {
-  return { interaction:{mode:'nearest',intersect:false}, onHover:(_, elements, chart) => { const index = elements[0]?.datasetIndex ?? -1; if (chart.$hoveredDataset !== index) { chart.$hoveredDataset = index; chart.update('none'); } } };
+function hoverOptions() { return {interaction:{mode:'nearest',intersect:false},onHover:(_, elements, chart) => { const index = elements[0]?.datasetIndex ?? -1; if (chart.$hoveredDataset !== index) { chart.$hoveredDataset = index; chart.update('none'); } }}; }
+function styleDatasets(chart) { chart.data.datasets.forEach(dataset => { dataset.borderColor = context => context.chart.$hoveredDataset === context.datasetIndex ? burgundy : grey; dataset.borderWidth = context => context.chart.$hoveredDataset === context.datasetIndex ? 3 : 1.5; }); }
+
+function makeTotalChart(data) {
+  new Chart(document.querySelector('#total-chart'), {type:'line',data:{labels:data.years,datasets:[{label:'London',data:data.years.map(year => data.totals.get(year)),borderColor:burgundy,backgroundColor:'rgba(123,38,56,.1)',borderWidth:2.5,hoverBorderWidth:4,pointRadius:0,pointHoverRadius:4,fill:true,tension:.25}]},options:{responsive:true,maintainAspectRatio:false,...hoverOptions(),plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}}}});
 }
 
-function boroughName(name) { return name.replace(/^London Borough of /, '').replace(/ Council$/, ''); }
-
-function makeChart(data) {
-  const years = data.allYears.years.buckets.map(bucket => new Date(bucket.key).getUTCFullYear());
-  const boroughs = new Map();
-  for (const borough of data.boroughs.buckets) {
-    const name = boroughName(borough.key);
-    const totals = boroughs.get(name) || new Map();
-    for (const bucket of borough.started.years.buckets) totals.set(new Date(bucket.key).getUTCFullYear(), bucket.homes.value || 0);
-    boroughs.set(name, totals);
-  }
-  const series = [...boroughs].map(([label, totals]) => ({ label, data: years.map(year => totals.get(year) || 0) }));
-  const chart = new Chart(document.querySelector('#chart'), { type:'line', data:{labels:years,datasets:series.map(borough => ({...borough,borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}))}, plugins:[endLabel], options:{...hoverOptions(),responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}}} });
-  chart.data.datasets.forEach(dataset => { dataset.borderColor = context => context.chart.$hoveredDataset === context.datasetIndex ? burgundy : grey; dataset.borderWidth = context => context.chart.$hoveredDataset === context.datasetIndex ? 3 : 1.5; });
-}
-
-function makeTotalChart(buckets) {
-  new Chart(document.querySelector('#total-chart'), { type:'line', data:{labels:buckets.map(bucket => new Date(bucket.key).getUTCFullYear()),datasets:[{label:'London',data:buckets.map(bucket => bucket.homes.value || 0),borderColor:burgundy,backgroundColor:'rgba(123,38,56,.1)',borderWidth:2.5,hoverBorderWidth:4,pointRadius:0,pointHoverRadius:4,fill:true,tension:.25}]}, options:{responsive:true,maintainAspectRatio:false,...hoverOptions(),plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}}} });
+function makeBoroughChart(data) {
+  const series = [...data.boroughs].map(([label, borough]) => ({label,data:data.years.map(year => borough.totals.get(year) || 0),borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}));
+  const chart = new Chart(document.querySelector('#chart'), {type:'line',data:{labels:data.years,datasets:series},plugins:[endLabel],options:{...hoverOptions(),responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}}}});
+  styleDatasets(chart);
 }
 
 function makeLagChart(data) {
-  const years = data.allYears.years.buckets.map(bucket => new Date(bucket.key).getUTCFullYear());
-  const datasets = data.boroughs.buckets.map(borough => {
-    const lags = new Map(borough.lag.years.buckets.map(bucket => [new Date(bucket.key).getUTCFullYear(), bucket.lagMonths.value]));
-    return { label:boroughName(borough.key), data:years.map(year => lags.has(year) ? {x:lags.get(year),y:year} : null), borderColor:grey, backgroundColor:grey, borderWidth:1.5, pointRadius:0, pointHoverRadius:0, tension:.25 };
-  });
-  const chart = new Chart(document.querySelector('#lag-chart'), { type:'line', data:{datasets}, plugins:[endLabel], options:{...hoverOptions(),indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{title:{display:true,text:'Average lag (months)'},grid:{color:'rgba(23,43,42,.08)'}},y:{type:'linear',reverse:true,min:years[0],max:years.at(-1),ticks:{stepSize:1,maxTicksLimit:12,callback:value=>Number(value).toString()},grid:{display:false}}}} });
-  chart.data.datasets.forEach(dataset => { dataset.borderColor = context => context.chart.$hoveredDataset === context.datasetIndex ? burgundy : grey; dataset.borderWidth = context => context.chart.$hoveredDataset === context.datasetIndex ? 3 : 1.5; });
+  const series = [...data.boroughs].map(([label, borough]) => ({label,data:data.years.map(year => borough.lags.has(year) ? borough.lags.get(year).sum / borough.lags.get(year).count : null),borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}));
+  const chart = new Chart(document.querySelector('#lag-chart'), {type:'line',data:{labels:data.years,datasets:series},plugins:[endLabel],options:{...hoverOptions(),responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{title:{display:true,text:'Average lag (months)'},grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toFixed(0)}}}}});
+  styleDatasets(chart);
 }
 
-function makeCompleteness(boroughs) {
-  const rows = boroughs.map(borough => [boroughName(borough.key), borough.doc_count ? borough.complete.doc_count / borough.doc_count * 100 : 0]).sort((a,b) => a[0].localeCompare(b[0]));
-  document.querySelector('#completeness').innerHTML = rows.map(([name, percentage]) => `<tr><td>${name.replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]))}</td><td>${percentage.toFixed(1)}%</td></tr>`).join('');
+function makeCompleteness(data) {
+  const rows = [...data.boroughs].map(([name, borough]) => [name, borough.records ? borough.complete / borough.records * 100 : 0]).sort((a,b) => a[0].localeCompare(b[0]));
+  const escape = text => text.replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+  document.querySelector('#completeness').innerHTML = rows.map(([name, percentage]) => `<tr><td>${escape(name)}</td><td>${percentage.toFixed(1)}%</td></tr>`).join('');
 }
 
-makeChart(window.DATA.aggregations);
-makeTotalChart(window.DATA.aggregations.allYears.years.buckets);
-makeLagChart(window.DATA.aggregations);
-makeCompleteness(window.DATA.aggregations.boroughs.buckets);
-status.textContent = `${window.DATA.hits.total.value.toLocaleString()} residential records · pre-downloaded API data`;
+const data = aggregate(window.DATA.records);
+makeTotalChart(data);
+makeBoroughChart(data);
+makeLagChart(data);
+makeCompleteness(data);
+status.textContent = `${window.DATA.records.length.toLocaleString()} residential records · pre-downloaded API data`;
