@@ -55,4 +55,4 @@ makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential
 makeLineChart('completeness-chart', data.years, data.years.map(year => data.byYear.get(year).complete / data.byYear.get(year).records * 100), green, 'Records with all three dates (%)');
 makeLineChart('council-chart', data.years, data.years.map(year => data.byYear.get(year).council.length ? median(data.byYear.get(year).council) : null), burgundy, 'Median months');
 makeLineChart('developer-chart', data.years, data.years.map(year => data.byYear.get(year).developer.length ? median(data.byYear.get(year).developer) : null), green, 'Median months');
-status.textContent = `${window.DATA.records.length.toLocaleString()} allowed residential records · starts 2000–2025 · pre-downloaded API data`;
+status.textContent = `${window.DATA.records.length.toLocaleString()} approved residential records · starts 2000–2025 · pre-downloaded API data`;

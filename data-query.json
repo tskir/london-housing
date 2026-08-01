@@ -4,7 +4,7 @@
   "query": {
     "bool": {
       "filter": [
-        { "term": { "status.raw": "Allowed" } },
+        { "term": { "status.raw": "Approved" } },
         { "range": { "application_details.residential_details.total_no_proposed_residential_units": { "gt": 0 } } },
         { "range": { "actual_commencement_date": { "gte": "01/01/2000", "lte": "31/12/2025" } } }
       ]
