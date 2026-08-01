@@ -18,8 +18,7 @@ h2 { font-size:29px; }
 .hint { color:var(--muted); font-size:12px; margin:0 0 4px; }
 .definition { color:var(--muted); font-size:13px; max-width:720px; margin:22px 0 0; }
 .definition strong { color:var(--ink); }
-.chart-wrap { height:min(66vw,620px); min-height:400px; margin-top:28px; }
-.chart-note { color:var(--muted); font-size:12px; margin:10px 0 0; }
+.chart-wrap { height:min(80vw,820px); min-height:520px; margin-top:28px; }
 footer { color:var(--muted); font-size:12px; padding:22px 0 48px; }
 a { color:inherit; }
-@media (max-width:650px) { main { width:min(100% - 28px,1180px); } .hero { padding-top:44px; } .card-heading { display:block; } .hint { margin-top:12px; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:440px; } }
+@media (max-width:650px) { main { width:min(100% - 28px,1180px); } .hero { padding-top:44px; } .card-heading { display:block; } .hint { margin-top:12px; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:520px; } }
