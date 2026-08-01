@@ -13,7 +13,7 @@ function makeChart(data) {
     }
     boroughs.set(name, totals);
   }
-  const series = [...boroughs].map(([label, totals]) => ({ label, data: years.map(year => totals.get(year) || 0) }));
+  const series = [...boroughs].map(([label, totals]) => ({ label, data: years.map(year => totals.get(year) || null) }));
   const grey = '#b4b0aa';
   const burgundy = '#7b2638';
   const endLabel = { id: 'endLabel', afterDraw(chart) {
@@ -34,7 +34,7 @@ function makeChart(data) {
     type: 'line',
     data: { labels: years, datasets: series.map(borough => ({ ...borough, borderColor: grey, backgroundColor: grey, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 0, tension: .25 })) },
     plugins: [endLabel],
-    options: { responsive:true, maintainAspectRatio:false, layout:{padding:{right:120}}, interaction:{mode:'nearest',intersect:false}, onHover:(_, elements, chart) => { const index = elements[0]?.datasetIndex ?? -1; if (chart.$hoveredDataset !== index) { chart.$hoveredDataset = index; chart.update('none'); } }, elements:{line:{spanGaps:true}}, plugins:{legend:{display:false},tooltip:{enabled:false}}, scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}} }
+    options: { responsive:true, maintainAspectRatio:false, layout:{padding:{right:120}}, interaction:{mode:'nearest',intersect:false}, onHover:(_, elements, chart) => { const index = elements[0]?.datasetIndex ?? -1; if (chart.$hoveredDataset !== index) { chart.$hoveredDataset = index; chart.update('none'); } }, elements:{line:{spanGaps:true}}, plugins:{legend:{display:false},tooltip:{enabled:false}}, scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{type:'logarithmic',min:1,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}} }
   });
   chart.options.animation = false;
   chart.config.data.datasets.forEach(dataset => {
