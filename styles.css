@@ -43,9 +43,7 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 .caveat-block .card { color:var(--ink); }
 .small-chart-wrap { height:300px; margin-top:26px; }
 .delays-block { padding-bottom:70px; }
-.scale-block { border-top:1px solid rgba(23,43,42,.14); padding-bottom:70px; }
-.size-delay-grid { margin-top:30px; }
-.size-note { margin-top:22px; }
+.delay-heading { margin-top:30px; }
 .methodology { border-top:1px solid rgba(23,43,42,.14); padding:64px 0 70px; }
 .endpoint { background:var(--ink); border-radius:14px; color:white; display:grid; gap:8px; margin-top:32px; max-width:900px; padding:22px; }
 .endpoint strong { color:var(--mint); font-size:11px; letter-spacing:.12em; text-transform:uppercase; }
