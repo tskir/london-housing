@@ -13,7 +13,7 @@ api_key='be2rmRnt&'
 PLD_API_KEY="$api_key" python3 fetch-data.py
 ```
 
-`fetch-data.py` uses the API's scroll endpoint to download every residential record with a recorded construction start from 1980 through 2025, using the fields listed in `data-query.json`: submitted (`valid_date`), approved (`decision_date`), started (`actual_commencement_date`) and residential units. The browser computes all charts locally. 2026 is excluded because it is an incomplete year. The API key is the guest key documented in `pld-api.md`.
+`fetch-data.py` uses the API's scroll endpoint to download every record with `status.raw = "Allowed"`, more than zero proposed residential units, and a recorded construction start from 2000 through 2025. The fields are listed in `data-query.json`: submitted (`valid_date`), approved (`decision_date`), started (`actual_commencement_date`), status and residential units. The browser computes all charts locally. 2026 is excluded because it is an incomplete year. Negative date intervals are excluded from delay medians as invalid chronology, but remain part of the completeness denominator. The API key is the guest key documented in `pld-api.md`.
 
 After updating `data.js`, commit and push it to publish the new snapshot.
 

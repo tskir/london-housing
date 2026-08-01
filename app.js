@@ -1,7 +1,7 @@
 const status = document.querySelector('#status');
 const burgundy = '#7b2638';
 const green = '#759b8d';
-const minYear = 1980;
+const minYear = 2000;
 const maxYear = 2025;
 
 function parseDate(value) {
@@ -32,8 +32,10 @@ function aggregate(records) {
     const approved = parseDate(record.decision_date);
     if (!submitted || !approved) continue;
     row.complete++;
-    row.council.push(monthsBetween(submitted, approved));
-    row.developer.push(monthsBetween(approved, actual));
+    const councilDelay = monthsBetween(submitted, approved);
+    const developerDelay = monthsBetween(approved, actual);
+    if (councilDelay >= 0) row.council.push(councilDelay);
+    if (developerDelay >= 0) row.developer.push(developerDelay);
   }
   return {years, byYear};
 }
@@ -53,4 +55,4 @@ makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential
 makeLineChart('completeness-chart', data.years, data.years.map(year => data.byYear.get(year).complete / data.byYear.get(year).records * 100), green, 'Records with all three dates (%)');
 makeLineChart('council-chart', data.years, data.years.map(year => data.byYear.get(year).council.length ? median(data.byYear.get(year).council) : null), burgundy, 'Median months');
 makeLineChart('developer-chart', data.years, data.years.map(year => data.byYear.get(year).developer.length ? median(data.byYear.get(year).developer) : null), green, 'Median months');
-status.textContent = `${window.DATA.records.length.toLocaleString()} residential records · starts through 2025 · pre-downloaded API data`;
+status.textContent = `${window.DATA.records.length.toLocaleString()} allowed residential records · starts 2000–2025 · pre-downloaded API data`;
