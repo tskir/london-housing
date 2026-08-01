@@ -2,6 +2,8 @@
 
 A fully static, overall view of London's residential construction pipeline: starts, process completeness, council delay and developer delay.
 
+The dashboard works as a scrolling report or a presentation: press **Space** for the next chapter/chart and **Shift + Space** to go back.
+
 The app is intentionally snapshot-based: `data.js` is the app's data source and is deployed alongside the HTML. The browser does not call the Planning London Datahub API, so the dashboard works on GitHub Pages without a backend or CORS dependency.
 
 ## Refresh the data
