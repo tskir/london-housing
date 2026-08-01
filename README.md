@@ -9,18 +9,15 @@ The app is intentionally snapshot-based: `data.js` is the app's data source and 
 Run these commands from the repository root whenever a new API snapshot is needed:
 
 ```bash
-today=$(date +%d/%m/%Y)
 api_key='be2rmRnt&'
 
 curl -sS 'https://planninglondondatahub.london.gov.uk/api-guest/applications/_search' \
   -H "X-API-AllowRequest: $api_key" \
   -H 'Content-Type: application/json' \
-  --data-binary @- <<EOF | sed 's/^/window.DATA = /; s/$/;/' > data.js
-{"size":0,"track_total_hits":true,"query":{"range":{"actual_commencement_date":{"gte":"01/01/1980","lte":"$today"}}},"aggs":{"years":{"date_histogram":{"field":"actual_commencement_date","calendar_interval":"year","min_doc_count":1},"aggs":{"homes":{"sum":{"field":"application_details.residential_details.total_no_proposed_residential_units"}}}},"boroughs":{"terms":{"field":"borough.raw","size":100},"aggs":{"years":{"date_histogram":{"field":"actual_commencement_date","calendar_interval":"year","min_doc_count":1},"aggs":{"homes":{"sum":{"field":"application_details.residential_details.total_no_proposed_residential_units"}}}}}}}}
-EOF
+  --data-binary @data-query.json | sed 's/^/window.DATA = /; s/$/;/' > data.js
 ```
 
-The query uses `actual_commencement_date` for the year and sums `application_details.residential_details.total_no_proposed_residential_units`. Records before 1980 are excluded because the live dataset contains malformed historical dates. The API key is the guest key documented in `pld-api.md`.
+`data-query.json` filters every chart to records with more than zero proposed residential units. It aggregates homes started by year, calculates average lag in months from `actual_commencement_date` minus `application_details.intended_commencement_date`, and counts records with both dates for the completeness table. Records before 1980 are excluded from time series because the API contains malformed historical dates. The API key is the guest key documented in `pld-api.md`.
 
 After updating `data.js`, commit and push it to publish the new snapshot.
 

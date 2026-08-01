@@ -1,0 +1,68 @@
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "range": {
+      "application_details.residential_details.total_no_proposed_residential_units": { "gt": 0 }
+    }
+  },
+  "aggs": {
+    "allYears": {
+      "filter": { "range": { "actual_commencement_date": { "gte": "01/01/1980", "lte": "now" } } },
+      "aggs": {
+        "years": {
+          "date_histogram": { "field": "actual_commencement_date", "calendar_interval": "year", "min_doc_count": 1 },
+          "aggs": { "homes": { "sum": { "field": "application_details.residential_details.total_no_proposed_residential_units" } } }
+        }
+      }
+    },
+    "boroughs": {
+      "terms": { "field": "borough.raw", "size": 100 },
+      "aggs": {
+        "started": {
+          "filter": { "range": { "actual_commencement_date": { "gte": "01/01/1980", "lte": "now" } } },
+          "aggs": {
+            "years": {
+              "date_histogram": { "field": "actual_commencement_date", "calendar_interval": "year", "min_doc_count": 1 },
+              "aggs": { "homes": { "sum": { "field": "application_details.residential_details.total_no_proposed_residential_units" } } }
+            }
+          }
+        },
+        "lag": {
+          "filter": {
+            "bool": {
+              "filter": [
+                { "range": { "actual_commencement_date": { "gte": "01/01/1980", "lte": "now" } } },
+                { "exists": { "field": "application_details.intended_commencement_date" } }
+              ]
+            }
+          },
+          "aggs": {
+            "years": {
+              "date_histogram": { "field": "actual_commencement_date", "calendar_interval": "year", "min_doc_count": 1 },
+              "aggs": {
+                "lagMonths": {
+                  "avg": {
+                    "script": {
+                      "source": "(doc['actual_commencement_date'].value.toInstant().toEpochMilli() - doc['application_details.intended_commencement_date'].value.toInstant().toEpochMilli()) / 2628000000.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "complete": {
+          "filter": {
+            "bool": {
+              "filter": [
+                { "exists": { "field": "actual_commencement_date" } },
+                { "exists": { "field": "application_details.intended_commencement_date" } }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

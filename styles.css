@@ -22,6 +22,17 @@ h2 { font-size:29px; }
 .total-card { margin-top:20px; }
 .borough-card { margin-top:20px; }
 .total-chart-wrap { height:300px; margin-top:28px; }
+.lag-hero { background:var(--ink); border-radius:20px; color:white; margin-top:46px; padding:42px 34px; }
+.lag-hero .eyebrow { color:var(--mint); }
+.lag-hero h2 { font-size:clamp(32px,5vw,58px); }
+.lag-hero p:last-child { color:#cbd8d1; max-width:570px; margin:18px 0 0; }
+.lag-card, .completeness-card { margin-top:20px; }
+.lag-chart-wrap { height:min(66vw,620px); min-height:400px; margin-top:28px; }
+.completeness-card { padding:30px; }
+table { border-collapse:collapse; margin-top:24px; width:100%; }
+th, td { border-bottom:1px solid rgba(23,43,42,.1); padding:10px 4px; text-align:left; }
+th:last-child, td:last-child { text-align:right; }
+th { color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
 footer { color:var(--muted); font-size:12px; padding:22px 0 48px; }
 a { color:inherit; }
-@media (max-width:650px) { main { width:min(100% - 28px,1180px); } .hero { padding-top:44px; } .card-heading { display:block; } .hint { margin-top:12px; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:380px; } }
+@media (max-width:650px) { main { width:min(100% - 28px,1180px); } .hero { padding-top:44px; } .card-heading { display:block; } .hint { margin-top:12px; } .chart-card, .completeness-card { padding:22px 12px 14px; } .chart-wrap, .lag-chart-wrap { min-height:380px; } .lag-hero { padding:30px 22px; } }
