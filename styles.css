@@ -42,6 +42,12 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 .caveat-block .section-number,.caveat-block .eyebrow { color:var(--mint); }
 .caveat-block .section-lede { color:#cbd8d1; }
 .caveat-block .card { color:var(--ink); }
+.conclusion-block { background:var(--burgundy); border-radius:22px; color:white; margin-left:calc((1120px - 100vw) / 2); margin-right:calc((1120px - 100vw) / 2); margin-top:32px; padding:72px max(20px,calc((100vw - 1120px) / 2)); }
+.conclusion-block .section-number { color:var(--mint); }
+.conclusion-block h2 em { color:var(--mint); }
+.conclusion-block .section-lede { color:#f6d9dc; max-width:760px; }
+.conclusion-text { color:#f6d9dc; font-size:19px; line-height:1.55; margin:26px 0 0; max-width:820px; }
+.conclusion-text strong { color:white; }
 .small-chart-wrap { height:300px; margin-top:26px; }
 .data-quality-card { margin-top:30px; padding:30px; }
 .quality-table-wrap { overflow-x:auto; }
@@ -77,4 +83,4 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 footer { border-top:1px solid rgba(23,43,42,.14); color:var(--muted); font-size:12px; padding:22px 0 48px; }
 a { color:inherit; }
 @media (max-width:1159px) { .caveat-block { margin-left:-20px; margin-right:-20px; padding-left:20px; padding-right:20px; } }
-@media (max-width:650px) { main { width:calc(100% - 28px); } .hero { padding-top:48px; } .story-block { padding-top:34px; } .process-block,.caveat-block,.delays-block,.status-cloud-block { padding-top:46px; } .card-heading { align-items:start; display:block; } .hint { margin-top:12px; text-align:left; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:320px; } .timeline,.metric-grid,.delay-grid { display:block; } .timeline-step { margin-bottom:12px; } .timeline-arrow { display:none; } .metric { margin-top:12px; } .caveat-block { margin-left:-14px; margin-right:-14px; padding-left:14px; padding-right:14px; } .methodology { padding-top:46px; } }
+@media (max-width:650px) { main { width:calc(100% - 28px); } .hero { padding-top:48px; } .story-block { padding-top:34px; } .process-block,.caveat-block,.delays-block,.status-cloud-block { padding-top:46px; } .card-heading { align-items:start; display:block; } .hint { margin-top:12px; text-align:left; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:320px; } .timeline,.metric-grid,.delay-grid { display:block; } .timeline-step { margin-bottom:12px; } .timeline-arrow { display:none; } .metric { margin-top:12px; } .caveat-block,.conclusion-block { margin-left:-14px; margin-right:-14px; padding-left:14px; padding-right:14px; } .methodology { padding-top:46px; } }
