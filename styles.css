@@ -23,6 +23,7 @@ h3 { font-size:27px; }
 .chart-toggle { display:flex; justify-content:flex-end; gap:4px; margin-bottom:7px; }
 .chart-toggle button { background:transparent; border:1px solid rgba(23,43,42,.2); border-radius:999px; color:var(--muted); cursor:pointer; font:500 11px 'DM Sans'; padding:5px 10px; }
 .chart-toggle button.active { background:var(--burgundy); border-color:var(--burgundy); color:white; }
+.submission-controls .chart-toggle { margin-bottom:4px; }
 .definition { color:var(--muted); font-size:13px; max-width:720px; margin:22px 0 0; }
 .definition strong { color:var(--ink); }
 .chart-wrap { height:min(56vw,520px); min-height:360px; margin-top:28px; }

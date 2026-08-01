@@ -174,19 +174,26 @@ function makeSizeDelayCharts(data, mode = 'units') {
 const statusColors = {Completed:burgundy, Commenced:green, Refused:'#d36b52', Withdrawn:'#a67c52', Pending:'#527f91', Other:'#9aaba4'};
 const statusPalette = ['#7b2638','#759b8d','#d36b52','#a67c52','#527f91','#8d789e','#9aaba4'];
 let submissionChart;
-function makeSubmissionChart(data, mode = 'units') {
-  const measure = mode === 'units' ? 'Residential units' : 'Applications';
+function makeSubmissionChart(data, mode = 'units', scale = 'absolute') {
+  const relative = scale === 'relative';
+  const measure = relative ? (mode === 'units' ? 'Share of residential units (%)' : 'Share of applications (%)') : (mode === 'units' ? 'Residential units' : 'Applications');
+  const totals = data.submissionYears.map(year => data.statuses.reduce((sum, label) => sum + (data.submissionByYear.get(year).get(label)?.[mode] || 0), 0));
   const datasets = data.statuses.map((label, index) => ({
     label,
-    data: data.submissionYears.map(year => data.submissionByYear.get(year).get(label)?.[mode] || 0),
+    data: data.submissionYears.map((year, yearIndex) => {
+      const value = data.submissionByYear.get(year).get(label)?.[mode] || 0;
+      return relative && totals[yearIndex] ? value / totals[yearIndex] * 100 : value;
+    }),
     backgroundColor: statusColors[label] || statusPalette[index % statusPalette.length],
     borderWidth: 0
   }));
   if (!submissionChart) {
-    submissionChart = new Chart(document.querySelector('#submission-chart'), {type:'bar',data:{labels:data.submissionYears,datasets},options:{...chartOptions(measure, value => Number(value).toLocaleString(), true),scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,title:{display:true,text:measure},beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}}}});
+    submissionChart = new Chart(document.querySelector('#submission-chart'), {type:'bar',data:{labels:data.submissionYears,datasets},options:{...chartOptions(measure, value => relative ? `${value}%` : Number(value).toLocaleString(), true),scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:relative ? 100 : undefined,title:{display:true,text:measure},beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>relative ? `${value}%` : Number(value).toLocaleString()}}}}});
   } else {
     submissionChart.data.datasets = datasets;
     submissionChart.options.scales.y.title.text = measure;
+    submissionChart.options.scales.y.max = relative ? 100 : undefined;
+    submissionChart.options.scales.y.ticks.callback = value => relative ? `${value}%` : Number(value).toLocaleString();
     submissionChart.update('none');
   }
 }
@@ -222,6 +229,8 @@ makeDelayCharts(data);
 makeSizeDelayCharts(data);
 makeSubmissionChart(data);
 makeStatusCloud(window.DATA.submission_records || window.DATA.records);
+let submissionMode = 'units';
+let submissionScale = 'absolute';
 document.querySelectorAll('[data-completeness-mode]').forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('[data-completeness-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
   makeCompletenessChart(data, button.dataset.completenessMode);
@@ -236,6 +245,12 @@ document.querySelectorAll('[data-size-delay-mode]').forEach(button => button.add
 }));
 document.querySelectorAll('[data-submission-mode]').forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('[data-submission-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
-  makeSubmissionChart(data, button.dataset.submissionMode);
+  submissionMode = button.dataset.submissionMode;
+  makeSubmissionChart(data, submissionMode, submissionScale);
+}));
+document.querySelectorAll('[data-submission-scale]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-submission-scale]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
+  submissionScale = button.dataset.submissionScale;
+  makeSubmissionChart(data, submissionMode, submissionScale);
 }));
 status.textContent = `${window.DATA.records.length.toLocaleString()} completed or commenced residential records · ${window.DATA.submission_records?.length.toLocaleString() || window.DATA.records.length.toLocaleString()} all-status submissions · pre-downloaded API data`;
