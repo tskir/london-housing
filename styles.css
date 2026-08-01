@@ -8,8 +8,6 @@ h1,h2 { margin:0; font-family:'Space Grotesk',sans-serif; letter-spacing:-.06em;
 h1 { font-size:clamp(52px,8vw,94px); max-width:760px; }
 h1 em { color:#759b8d; font-style:normal; }
 .intro { color:var(--muted); font-size:17px; max-width:390px; margin:26px 0 0; }
-button { border:0; border-radius:999px; background:var(--ink); color:white; cursor:pointer; font:700 13px 'DM Sans'; padding:13px 18px; position:absolute; right:0; bottom:46px; }
-button span { color:var(--mint); font-size:16px; margin-left:8px; }
 .status { align-items:center; color:var(--muted); display:flex; gap:9px; margin-bottom:16px; font-size:12px; }
 .dot { background:#53ac83; border-radius:50%; height:7px; width:7px; }
 .dot.error { background:var(--orange); }
@@ -18,7 +16,9 @@ button span { color:var(--mint); font-size:16px; margin-left:8px; }
 .card-heading { align-items:end; display:flex; justify-content:space-between; gap:20px; }
 h2 { font-size:29px; }
 .hint { color:var(--muted); font-size:12px; margin:0 0 4px; }
+.definition { color:var(--muted); font-size:13px; max-width:720px; margin:22px 0 0; }
+.definition strong { color:var(--ink); }
 .chart-wrap { height:min(66vw,620px); min-height:400px; margin-top:28px; }
 footer { color:var(--muted); font-size:12px; padding:22px 0 48px; }
 a { color:inherit; }
-@media (max-width:650px) { main { width:min(100% - 28px,1180px); } .hero { padding-top:44px; } button { position:static; margin-top:25px; } .card-heading { display:block; } .hint { margin-top:12px; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:440px; } }
+@media (max-width:650px) { main { width:min(100% - 28px,1180px); } .hero { padding-top:44px; } .card-heading { display:block; } .hint { margin-top:12px; } .chart-card { padding:22px 12px 14px; } .chart-wrap { min-height:440px; } }

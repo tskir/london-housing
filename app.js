@@ -14,13 +14,34 @@ function makeChart(data) {
     boroughs.set(name, totals);
   }
   const series = [...boroughs].map(([label, totals]) => ({ label, data: years.map(year => totals.get(year) || 0) }));
-  const colors = series.map((_, i) => `hsl(${155 + i * 11 % 190} 48% ${35 + i % 3 * 8}%)`);
+  const grey = '#b4b0aa';
+  const burgundy = '#7b2638';
+  const endLabel = { id: 'endLabel', afterDraw(chart) {
+    const index = chart.$hoveredDataset;
+    if (index === undefined || index < 0) return;
+    const point = chart.getDatasetMeta(index).data.at(-1);
+    if (!point) return;
+    const context = chart.ctx;
+    context.save();
+    context.fillStyle = burgundy;
+    context.font = '600 12px DM Sans';
+    context.textBaseline = 'middle';
+    context.fillText(chart.data.datasets[index].label, point.x + 10, point.y);
+    context.restore();
+  } };
   chart?.destroy();
   chart = new Chart(document.querySelector('#chart'), {
     type: 'line',
-    data: { labels: years, datasets: series.map((borough, i) => ({ ...borough, borderColor: colors[i], backgroundColor: colors[i], borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: .25 })) },
-    options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, elements:{line:{spanGaps:true}}, plugins:{legend:{position:'bottom',labels:{boxWidth:12,usePointStyle:true,padding:15,font:{size:11}}}, tooltip:{callbacks:{label: item => ` ${item.dataset.label}: ${item.formattedValue} homes`}}}, scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}} }
+    data: { labels: years, datasets: series.map(borough => ({ ...borough, borderColor: grey, backgroundColor: grey, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 0, tension: .25 })) },
+    plugins: [endLabel],
+    options: { responsive:true, maintainAspectRatio:false, layout:{padding:{right:120}}, interaction:{mode:'nearest',intersect:false}, onHover:(_, elements, chart) => { const index = elements[0]?.datasetIndex ?? -1; if (chart.$hoveredDataset !== index) { chart.$hoveredDataset = index; chart.update('none'); } }, elements:{line:{spanGaps:true}}, plugins:{legend:{display:false},tooltip:{enabled:false}}, scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}} }
   });
+  chart.options.animation = false;
+  chart.config.data.datasets.forEach(dataset => {
+    dataset.borderColor = context => context.chart.$hoveredDataset === context.datasetIndex ? burgundy : grey;
+    dataset.borderWidth = context => context.chart.$hoveredDataset === context.datasetIndex ? 3 : 1.5;
+  });
+  chart.update('none');
 }
 
 makeChart(window.DATA.aggregations);
