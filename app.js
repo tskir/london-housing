@@ -1,6 +1,6 @@
 const status = document.querySelector('#status');
 const burgundy = '#7b2638';
-const green = '#759b8d';
+const green = '#187a6e';
 const minYear = 2000;
 const delayMinYear = 2018;
 const submissionMinYear = 2000;
@@ -12,7 +12,7 @@ const sizeBands = [
   {label:'201–500 units', min:201, max:500},
   {label:'501+ units', min:501, max:Infinity}
 ];
-const sizeColors = ['#7b2638','#95515e','#b17b83','#759b8d','#47756d'];
+const sizeColors = ['#7b2638','#157f9b','#d67c2f','#5b4b9a','#2f7d50'];
 
 function parseDate(value) {
   if (!value) return null;
@@ -191,19 +191,21 @@ function makeSizeDelayCharts(data, mode = 'units') {
   const charts = [[sizeCouncilChart, 'size-council-chart', 'council'], [sizeDeveloperChart, 'size-developer-chart', 'developer']];
   charts.forEach(([chart, id, key], index) => {
     if (!chart) {
-      const created = new Chart(document.querySelector(`#${id}`), {type:'line',data:{labels:data.delayYears,datasets:sizeDelayDatasets(data, key, mode)},options:chartOptions(title, value => Number(value).toFixed(0), true)});
+      const options = chartOptions(title, value => Number(value).toFixed(0), true);
+      options.scales.y.max = key === 'developer' && mode === 'units' ? 40 : undefined;
+      const created = new Chart(document.querySelector(`#${id}`), {type:'line',data:{labels:data.delayYears,datasets:sizeDelayDatasets(data, key, mode)},options});
       if (index === 0) sizeCouncilChart = created;
       else sizeDeveloperChart = created;
     } else {
       chart.data.datasets = sizeDelayDatasets(data, key, mode);
       chart.options.scales.y.title.text = title;
+      chart.options.scales.y.max = key === 'developer' && mode === 'units' ? 40 : undefined;
       chart.update('none');
     }
   });
 }
 
-const statusColors = {Completed:burgundy, Commenced:green, Refused:'#d36b52', Withdrawn:'#a67c52', Pending:'#527f91', Other:'#9aaba4'};
-const statusPalette = ['#7b2638','#759b8d','#d36b52','#a67c52','#527f91','#8d789e','#9aaba4'];
+const statusPalette = ['#332288','#88ccee','#117733','#ddcc77','#cc6677','#44aa99','#882255','#aa4499','#999999'];
 let submissionChart;
 function submissionTooltipLabel(context, mode, relative) {
   const value = relative ? `${Number(context.raw).toFixed(1)}%` : `${Number(context.raw).toLocaleString()} ${mode === 'units' ? 'units' : 'applications'}`;
@@ -219,7 +221,7 @@ function makeSubmissionChart(data, mode = 'units', scale = 'absolute') {
       const value = data.submissionByYear.get(year).get(label)?.[mode] || 0;
       return relative && totals[yearIndex] ? value / totals[yearIndex] * 100 : value;
     }),
-    backgroundColor: statusColors[label] || statusPalette[index % statusPalette.length],
+    backgroundColor: statusPalette[index % statusPalette.length],
     borderWidth: 0
   }));
   const options = chartOptions(measure, value => relative ? `${value}%` : Number(value).toLocaleString(), true);
