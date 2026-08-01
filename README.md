@@ -1,6 +1,6 @@
-# London homes started
+# London's housing pipeline
 
-A fully static dashboard of homes whose construction has started, by year and London borough.
+A fully static, overall view of London's residential construction pipeline: starts, process completeness, council delay and developer delay.
 
 The app is intentionally snapshot-based: `data.js` is the app's data source and is deployed alongside the HTML. The browser does not call the Planning London Datahub API, so the dashboard works on GitHub Pages without a backend or CORS dependency.
 
@@ -13,7 +13,7 @@ api_key='be2rmRnt&'
 PLD_API_KEY="$api_key" python3 fetch-data.py
 ```
 
-`fetch-data.py` uses the API's scroll endpoint to download every record with more than zero proposed residential units, using the fields listed in `data-query.json`. The browser then computes homes started, average lag in months from `actual_commencement_date` minus `application_details.intended_commencement_date`, and completeness percentages locally. Lag and completeness use records with actual commencement dates from 2020 onwards; the other time series start in 1980 because the API contains malformed historical dates before then. The API key is the guest key documented in `pld-api.md`.
+`fetch-data.py` uses the API's scroll endpoint to download every residential record with a recorded construction start from 1980 through 2025, using the fields listed in `data-query.json`: submitted (`valid_date`), approved (`decision_date`), started (`actual_commencement_date`) and residential units. The browser computes all charts locally. 2026 is excluded because it is an incomplete year. The API key is the guest key documented in `pld-api.md`.
 
 After updating `data.js`, commit and push it to publish the new snapshot.
 
