@@ -28,6 +28,8 @@ h2 { font-size:29px; }
 .lag-hero p:last-child { color:#cbd8d1; max-width:570px; margin:18px 0 0; }
 .lag-card, .completeness-card { margin-top:20px; }
 .lag-chart-wrap { height:min(66vw,620px); min-height:400px; margin-top:28px; }
+.overall-lag-card { margin-top:20px; }
+.overall-lag-chart-wrap { height:300px; margin-top:28px; }
 .completeness-card { padding:30px; }
 table { border-collapse:collapse; margin-top:24px; width:100%; }
 th, td { border-bottom:1px solid rgba(23,43,42,.1); padding:10px 4px; text-align:left; }
