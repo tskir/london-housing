@@ -91,7 +91,9 @@ function aggregate(records, submissionRecords) {
     }
     return [year, grouped];
   }));
-  return {years, delayYears, submissionYears, byYear, sizeByYear, submissionByYear:groupedSubmissionByYear, statuses:statuses.concat('Other')};
+  const preferredStatusOrder = ['Completed', 'Commenced', 'Approved', 'Application Under Consideration'];
+  const orderedStatuses = [...preferredStatusOrder.filter(label => statuses.includes(label)), ...statuses.filter(label => !preferredStatusOrder.includes(label)), 'Other'];
+  return {years, delayYears, submissionYears, byYear, sizeByYear, submissionByYear:groupedSubmissionByYear, statuses:orderedStatuses};
 }
 
 function chartOptions(yTitle, yFormat = value => Number(value).toLocaleString(), showLegend = false) {
