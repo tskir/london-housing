@@ -246,7 +246,7 @@ function makeStatusCloud(records) {
   const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   const cloud = document.querySelector('#status-cloud');
   cloud.replaceChildren();
-  cloud.style.height = `${Math.max(560, entries.length * 12)}px`;
+  cloud.style.height = `${Math.max(720, entries.length * 18)}px`;
   const low = Math.log10(entries[entries.length - 1][1]);
   const high = Math.log10(entries[0][1]);
   const words = [];
@@ -265,20 +265,28 @@ function makeStatusCloud(records) {
   const placed = [];
   const width = cloud.clientWidth;
   const height = cloud.clientHeight;
+  const canPlace = candidate => candidate.left >= 8 && candidate.top >= 8 && candidate.right <= width - 8 && candidate.bottom <= height - 8 && placed.every(item => candidate.right + 8 < item.left || candidate.left - 8 > item.right || candidate.bottom + 8 < item.top || candidate.top - 8 > item.bottom);
   for (const word of words) {
     const wordWidth = word.offsetWidth;
     const wordHeight = word.offsetHeight;
     let position;
-    for (let step = 0; step < 4000 && !position; step++) {
+    for (let step = 0; step < 8000 && !position; step++) {
       const angle = step * .45;
-      const radius = 3.5 * Math.sqrt(step);
+      const radius = 7 * Math.sqrt(step);
       const left = width / 2 + Math.cos(angle) * radius - wordWidth / 2;
       const top = height / 2 + Math.sin(angle) * radius * .62 - wordHeight / 2;
       const candidate = {left, top, right:left + wordWidth, bottom:top + wordHeight};
-      if (candidate.left < 8 || candidate.top < 8 || candidate.right > width - 8 || candidate.bottom > height - 8) continue;
-      if (placed.every(item => candidate.right + 8 < item.left || candidate.left - 8 > item.right || candidate.bottom + 8 < item.top || candidate.top - 8 > item.bottom)) position = candidate;
+      if (canPlace(candidate)) position = candidate;
     }
-    position ||= {left:8, top:8};
+    if (!position) {
+      for (let top = 8; top <= height - wordHeight - 8 && !position; top += 8) {
+        for (let left = 8; left <= width - wordWidth - 8; left += 8) {
+          const candidate = {left, top, right:left + wordWidth, bottom:top + wordHeight};
+          if (canPlace(candidate)) position = candidate;
+        }
+      }
+    }
+    if (!position) throw new Error('Could not place status word');
     word.style.left = `${position.left}px`;
     word.style.top = `${position.top}px`;
     placed.push({...position, right:position.left + wordWidth, bottom:position.top + wordHeight});
