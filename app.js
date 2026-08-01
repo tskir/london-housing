@@ -142,8 +142,10 @@ function makeDataQualityTable(records) {
     tableRow.append(statusCell);
     for (const [, key] of fields) {
       const cell = document.createElement('td');
-      if ((label === 'Approved' && (key === 'commenced' || key === 'completed')) || (label === 'Commenced' && key === 'completed')) cell.className = 'data-bug';
-      cell.textContent = row.units ? `${(row[key] / row.units * 100).toFixed(1)}%` : '—';
+      const value = document.createElement('span');
+      if ((label === 'Approved' && (key === 'commenced' || key === 'completed')) || (label === 'Commenced' && key === 'completed')) value.className = 'data-bug';
+      value.textContent = row.units ? `${(row[key] / row.units * 100).toFixed(1)}%` : '—';
+      cell.append(value);
       tableRow.append(cell);
     }
     body.append(tableRow);

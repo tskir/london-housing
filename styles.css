@@ -57,7 +57,7 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 .quality-table thead th { color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
 .quality-table tbody th { color:var(--burgundy); font:700 17px 'Space Grotesk'; }
 .quality-table tbody td { color:var(--ink); font:600 22px 'Space Grotesk'; }
-.quality-table tbody td.data-bug { background:#f7dfe2; color:var(--burgundy); }
+.quality-table tbody td .data-bug { background:#f7dfe2; border-radius:4px; color:var(--burgundy); display:inline-block; padding:2px 6px; }
 .size-delay-heading { margin:52px 0 0; }
 .submission-chart-wrap { height:min(56vw,460px); min-height:340px; margin-top:28px; }
 .delays-block { padding-bottom:70px; }
