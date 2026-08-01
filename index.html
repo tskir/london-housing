@@ -80,9 +80,9 @@
       <h2>When did these applications<br><em>enter the council pipeline?</em></h2>
       <p class="section-lede">This widens the lens beyond construction starts: every residential application submitted in 2000–2025 appears here, including refused, withdrawn and not-yet-commenced applications.</p>
       <section class="card chart-card">
-        <div class="card-heading"><div><p class="eyebrow">2000–2025 · year submitted to council</p><h3>Submitted applications, by status</h3></div><div><div class="chart-toggle" role="group" aria-label="Submission chart measure"><button type="button" class="active" data-submission-mode="units" aria-pressed="true">Units</button><button type="button" data-submission-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Top five statuses; all others are Other.</p></div></div>
-        <div class="submission-chart-wrap"><canvas id="submission-chart" aria-label="Stacked bar chart showing residential units submitted to council by year and the five most common application statuses from 2000 to 2025"></canvas></div>
-        <p class="definition">Units counts the proposed residential units in each application. Applications counts each application once. The five named statuses are the most common by application count across 2000–2025; every remaining API status is grouped into <strong>Other</strong>. Unlike the earlier sections, this uses all statuses, not only <code>Completed</code> and <code>Commenced</code>.</p>
+        <div class="card-heading"><div><p class="eyebrow">2000–2025 · year submitted to council</p><h3>Submitted applications, by status</h3></div><div><div class="chart-toggle" role="group" aria-label="Submission chart measure"><button type="button" class="active" data-submission-mode="units" aria-pressed="true">Units</button><button type="button" data-submission-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Top eight statuses; all others are Other.</p></div></div>
+        <div class="submission-chart-wrap"><canvas id="submission-chart" aria-label="Stacked bar chart showing residential units submitted to council by year and the eight most common application statuses from 2000 to 2025"></canvas></div>
+        <p class="definition">Units counts the proposed residential units in each application. Applications counts each application once. The eight named statuses are the most common by application count across 2000–2025; every remaining API status is grouped into <strong>Other</strong>. Unlike the earlier sections, this uses all statuses, not only <code>Completed</code> and <code>Commenced</code>.</p>
       </section>
     </section>
 
@@ -103,12 +103,21 @@
             <tr><td>Council delay</td><td><code>valid_date</code> → <code>decision_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Developer delay</td><td><code>decision_date</code> → <code>actual_commencement_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Size-split delays</td><td>Residential units + the three dates</td><td>Unit mode sorts delays by month and finds the point where cumulative proposed units reaches 50% of all units in the band. Applications mode uses the ordinary median, where each application counts once. Both are split into 1–5, 6–50, 51–200, 201–500 and 501+ units.</td></tr>
-            <tr><td>Submission status</td><td><code>valid_date</code><br><code>status</code><br><code>total_no_proposed_residential_units</code></td><td>Separate all-status query: sum units, or count applications, by submission year for 2000–2025. The five most common statuses by application count are shown separately; all others are grouped as Other.</td></tr>
+            <tr><td>Submission status</td><td><code>valid_date</code><br><code>status</code><br><code>total_no_proposed_residential_units</code></td><td>Separate all-status query: sum units, or count applications, by submission year for 2000–2025. The eight most common statuses by application count are shown separately; all others are grouped as Other.</td></tr>
+            <tr><td>Status word cloud</td><td><code>status</code></td><td>Every distinct status in the all-status submission dataset, sized by <code>log10(application count)</code>.</td></tr>
           </tbody>
         </table>
       </div>
       </div>
     </details>
+
+    <section class="story-block status-cloud-block">
+      <p class="section-number">07 / The status soup</p>
+      <h2>One application.<br><em>So many answers.</em></h2>
+      <p class="section-lede">Every distinct status in the full residential submission dataset appears below. The larger the word, the more often that status occurs.</p>
+      <div id="status-cloud" class="status-cloud" role="list" aria-label="All application statuses, sized by number of applications"></div>
+      <p class="definition">Word size is scaled with <code>log10(application count)</code>, so both the dominant statuses and the long tail remain visible. This includes raw API labels, including internal codes and missing values grouped as <strong>Unknown</strong>.</p>
+    </section>
 
     <footer>Source: <a href="https://planninglondondatahub.london.gov.uk/" target="_blank" rel="noreferrer">Planning London Datahub</a></footer>
   </main>

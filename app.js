@@ -25,6 +25,8 @@ function parseDate(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+function statusLabel(value) { const label = String(value ?? '').trim(); return label || 'Unknown'; }
+
 function monthsBetween(start, end) { return (end - start) / (1000 * 60 * 60 * 24 * 30.4375); }
 function median(values) { const sorted = values.slice().sort((a,b) => a - b); const middle = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2; }
 function weightedMedian(values) {
@@ -71,7 +73,7 @@ function aggregate(records, submissionRecords) {
     const submittedYear = parseDate(record.valid_date)?.getUTCFullYear();
     if (submittedYear < submissionMinYear || submittedYear > maxYear) continue;
     const units = record.application_details?.residential_details?.total_no_proposed_residential_units || 0;
-    const label = String(record.status || 'Unknown');
+    const label = statusLabel(record.status);
     const statusRow = submissionByYear.get(submittedYear);
     const current = statusRow.get(label) || {units:0, applications:0};
     current.units += units;
@@ -79,7 +81,7 @@ function aggregate(records, submissionRecords) {
     statusRow.set(label, current);
     submissionTotals.set(label, (submissionTotals.get(label) || 0) + 1);
   }
-  const statuses = [...submissionTotals.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5).map(([label]) => label);
+  const statuses = [...submissionTotals.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8).map(([label]) => label);
   const groupedSubmissionByYear = new Map(submissionYears.map(year => {
     const grouped = new Map(statuses.concat('Other').map(label => [label, {units:0, applications:0}]));
     for (const [label, values] of submissionByYear.get(year)) {
@@ -189,6 +191,29 @@ function makeSubmissionChart(data, mode = 'units') {
   }
 }
 
+function makeStatusCloud(records) {
+  const counts = new Map();
+  for (const record of records) {
+    const label = statusLabel(record.status);
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const low = Math.log10(entries[entries.length - 1][1]);
+  const high = Math.log10(entries[0][1]);
+  const cloud = document.querySelector('#status-cloud');
+  for (const [index, [label, count]] of entries.entries()) {
+    const word = document.createElement('span');
+    const scale = high === low ? 28 : 12 + (Math.log10(count) - low) / (high - low) * 42;
+    word.className = 'status-word';
+    word.style.setProperty('--word-size', `${scale.toFixed(1)}px`);
+    word.title = `${count.toLocaleString()} applications`;
+    word.textContent = label;
+    word.setAttribute('role', 'listitem');
+    word.dataset.index = index;
+    cloud.append(word);
+  }
+}
+
 const data = aggregate(window.DATA.records, window.DATA.submission_records || window.DATA.records);
 const values = key => data.years.map(year => data.byYear.get(year)[key]);
 makeLineChart('total-chart', data.years, values('homes'), burgundy, 'Residential units started', true);
@@ -196,6 +221,7 @@ makeCompletenessChart(data);
 makeDelayCharts(data);
 makeSizeDelayCharts(data);
 makeSubmissionChart(data);
+makeStatusCloud(window.DATA.submission_records || window.DATA.records);
 document.querySelectorAll('[data-completeness-mode]').forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('[data-completeness-mode]').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', item === button); });
   makeCompletenessChart(data, button.dataset.completenessMode);
