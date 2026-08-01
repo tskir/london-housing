@@ -174,6 +174,10 @@ function makeSizeDelayCharts(data, mode = 'units') {
 const statusColors = {Completed:burgundy, Commenced:green, Refused:'#d36b52', Withdrawn:'#a67c52', Pending:'#527f91', Other:'#9aaba4'};
 const statusPalette = ['#7b2638','#759b8d','#d36b52','#a67c52','#527f91','#8d789e','#9aaba4'];
 let submissionChart;
+function submissionTooltipLabel(context, mode, relative) {
+  const value = relative ? `${Number(context.raw).toFixed(1)}%` : `${Number(context.raw).toLocaleString()} ${mode === 'units' ? 'units' : 'applications'}`;
+  return `${context.dataset.label}: ${value}`;
+}
 function makeSubmissionChart(data, mode = 'units', scale = 'absolute') {
   const relative = scale === 'relative';
   const measure = relative ? (mode === 'units' ? 'Share of residential units (%)' : 'Share of applications (%)') : (mode === 'units' ? 'Residential units' : 'Applications');
@@ -187,10 +191,14 @@ function makeSubmissionChart(data, mode = 'units', scale = 'absolute') {
     backgroundColor: statusColors[label] || statusPalette[index % statusPalette.length],
     borderWidth: 0
   }));
+  const options = chartOptions(measure, value => relative ? `${value}%` : Number(value).toLocaleString(), true);
+  options.plugins.tooltip = {enabled:true,callbacks:{label:context => submissionTooltipLabel(context, mode, relative)}};
+  options.scales = {x:{stacked:true,grid:{display:false}},y:{stacked:true,max:relative ? 100 : undefined,title:{display:true,text:measure},beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>relative ? `${value}%` : Number(value).toLocaleString()}}};
   if (!submissionChart) {
-    submissionChart = new Chart(document.querySelector('#submission-chart'), {type:'bar',data:{labels:data.submissionYears,datasets},options:{...chartOptions(measure, value => relative ? `${value}%` : Number(value).toLocaleString(), true),scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:relative ? 100 : undefined,title:{display:true,text:measure},beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>relative ? `${value}%` : Number(value).toLocaleString()}}}}});
+    submissionChart = new Chart(document.querySelector('#submission-chart'), {type:'bar',data:{labels:data.submissionYears,datasets},options});
   } else {
     submissionChart.data.datasets = datasets;
+    submissionChart.options.plugins.tooltip.callbacks.label = context => submissionTooltipLabel(context, mode, relative);
     submissionChart.options.scales.y.title.text = measure;
     submissionChart.options.scales.y.max = relative ? 100 : undefined;
     submissionChart.options.scales.y.ticks.callback = value => relative ? `${value}%` : Number(value).toLocaleString();
@@ -205,12 +213,15 @@ function makeStatusCloud(records) {
     counts.set(label, (counts.get(label) || 0) + 1);
   }
   const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const cloud = document.querySelector('#status-cloud');
+  cloud.replaceChildren();
+  cloud.style.height = `${Math.max(560, entries.length * 12)}px`;
   const low = Math.log10(entries[entries.length - 1][1]);
   const high = Math.log10(entries[0][1]);
-  const cloud = document.querySelector('#status-cloud');
+  const words = [];
   for (const [index, [label, count]] of entries.entries()) {
     const word = document.createElement('span');
-    const scale = high === low ? 28 : 12 + (Math.log10(count) - low) / (high - low) * 42;
+    const scale = high === low ? 28 : 10 + (Math.log10(count) - low) / (high - low) * 54;
     word.className = 'status-word';
     word.style.setProperty('--word-size', `${scale.toFixed(1)}px`);
     word.title = `${count.toLocaleString()} applications`;
@@ -218,6 +229,28 @@ function makeStatusCloud(records) {
     word.setAttribute('role', 'listitem');
     word.dataset.index = index;
     cloud.append(word);
+    words.push(word);
+  }
+  const placed = [];
+  const width = cloud.clientWidth;
+  const height = cloud.clientHeight;
+  for (const word of words) {
+    const wordWidth = word.offsetWidth;
+    const wordHeight = word.offsetHeight;
+    let position;
+    for (let step = 0; step < 4000 && !position; step++) {
+      const angle = step * .45;
+      const radius = 3.5 * Math.sqrt(step);
+      const left = width / 2 + Math.cos(angle) * radius - wordWidth / 2;
+      const top = height / 2 + Math.sin(angle) * radius * .62 - wordHeight / 2;
+      const candidate = {left, top, right:left + wordWidth, bottom:top + wordHeight};
+      if (candidate.left < 8 || candidate.top < 8 || candidate.right > width - 8 || candidate.bottom > height - 8) continue;
+      if (placed.every(item => candidate.right + 8 < item.left || candidate.left - 8 > item.right || candidate.bottom + 8 < item.top || candidate.top - 8 > item.bottom)) position = candidate;
+    }
+    position ||= {left:8, top:8};
+    word.style.left = `${position.left}px`;
+    word.style.top = `${position.top}px`;
+    placed.push({...position, right:position.left + wordWidth, bottom:position.top + wordHeight});
   }
 }
 
