@@ -33,4 +33,4 @@ If the link returns 404, enable Pages once in the repository: **Settings → Pag
 
 The app loads Chart.js from jsDelivr, so the chart needs an internet connection.
 
-The completeness chart defaults to a unit-weighted percentage: units in complete records divided by all started units. A toggle retains the application-weighted version. The delay charts begin in 2018, when at least 20% of applications have the three required dates. Delay charts default to unit-weighted medians, with an application-weighted toggle.
+The completeness chart defaults to a unit-weighted percentage: units in complete records divided by all started units. A toggle retains the application-weighted version. The delay charts begin in 2018, when at least 20% of applications have the three required dates, and include overall and development-size splits. They default to unit-weighted medians, with an application-weighted toggle. The submission chart covers 2020–2025 and groups the snapshot’s records by submission year and `Completed` / `Commenced` status; it also toggles between units and applications.

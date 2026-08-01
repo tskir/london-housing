@@ -42,6 +42,8 @@ code { color:var(--burgundy); font:500 12px 'DM Sans'; }
 .caveat-block .section-lede { color:#cbd8d1; }
 .caveat-block .card { color:var(--ink); }
 .small-chart-wrap { height:300px; margin-top:26px; }
+.size-delay-heading { margin:52px 0 0; }
+.submission-chart-wrap { height:min(56vw,460px); min-height:340px; margin-top:28px; }
 .delays-block { padding-bottom:70px; }
 .delay-heading { margin-top:30px; }
 .methodology { border-top:1px solid rgba(23,43,42,.14); padding:64px 0 70px; }

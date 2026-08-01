@@ -67,12 +67,29 @@
         <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="developer-chart" aria-label="Line chart showing median developer delay in months by year from 2018 to 2025"></canvas></div></section>
       </div>
       <p class="definition">Units weights each delay by the number of proposed residential units in the application. Applications gives each application one vote. Both modes use the median and exclude negative date intervals.</p>
+      <div class="size-delay-heading"><p class="eyebrow">By development size</p><h3>How the wait changes with scale</h3></div>
+      <div class="delay-grid">
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Council delay</p><h3>Submission to approval</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="size-council-chart" aria-label="Line chart showing median council delay by residential development size and year from 2018 to 2025"></canvas></div></section>
+        <section class="card chart-card"><div class="card-heading"><div><p class="eyebrow">Developer delay</p><h3>Approval to construction</h3></div><p class="hint">Median months</p></div><div class="small-chart-wrap"><canvas id="size-developer-chart" aria-label="Line chart showing median developer delay by residential development size and year from 2018 to 2025"></canvas></div></section>
+      </div>
+      <p class="definition">Each line groups applications by proposed residential units: 1–5, 6–50, 51–200, 201–500 and 501+. The same Units / Applications toggle applies to these charts.</p>
+    </section>
+
+    <section class="story-block submissions-block">
+      <p class="section-number">05 / The record behind the record</p>
+      <h2>When did these applications<br><em>enter the council pipeline?</em></h2>
+      <p class="section-lede">Looking back from construction starts, this shows when the applications were submitted and which status they carry in the snapshot.</p>
+      <section class="card chart-card">
+        <div class="card-heading"><div><p class="eyebrow">2020–2025 · year submitted to council</p><h3>Submitted applications, by status</h3></div><div><div class="chart-toggle" role="group" aria-label="Submission chart measure"><button type="button" class="active" data-submission-mode="units" aria-pressed="true">Units</button><button type="button" data-submission-mode="applications" aria-pressed="false">Applications</button></div><p class="hint">Stacked by application status.</p></div></div>
+        <div class="submission-chart-wrap"><canvas id="submission-chart" aria-label="Stacked bar chart showing residential units submitted to council by year and application status from 2020 to 2025"></canvas></div>
+        <p class="definition">Units counts the proposed residential units in each application. Applications counts each application once. The statuses are the API’s <code>Completed</code> and <code>Commenced</code> values used by this dashboard.</p>
+      </section>
     </section>
 
     <details class="methodology">
       <summary>Show methodology</summary>
       <div class="methodology-content">
-      <p class="section-number">05 / Data and method</p>
+      <p class="section-number">06 / Data and method</p>
       <h2>One source.<br><em>Clear calculations.</em></h2>
       <p class="section-lede">Every view uses the same pre-downloaded residential application snapshot. No graph queries a separate dataset.</p>
       <div class="endpoint"><strong>Primary query</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/applications/_search?scroll=1m</code><strong>Next pages</strong><code>POST https://planninglondondatahub.london.gov.uk/api-guest/_search/scroll</code></div>
@@ -85,6 +102,8 @@
             <tr><td>Completeness</td><td><code>valid_date</code><br><code>decision_date</code><br><code>actual_commencement_date</code></td><td>Records with all three non-empty dates ÷ all records started that year.</td></tr>
             <tr><td>Council delay</td><td><code>valid_date</code> → <code>decision_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
             <tr><td>Developer delay</td><td><code>decision_date</code> → <code>actual_commencement_date</code></td><td>Unit-weighted median calendar-month difference by default; toggle to application-weighted. Complete records and non-negative intervals only, from 2018 onwards.</td></tr>
+            <tr><td>Size-split delays</td><td>Residential units + the three dates</td><td>The same delay medians, split into 1–5, 6–50, 51–200, 201–500 and 501+ proposed units.</td></tr>
+            <tr><td>Submission status</td><td><code>valid_date</code><br><code>status</code><br><code>total_no_proposed_residential_units</code></td><td>Sum units, or count applications, by submission year and API status for 2020–2025.</td></tr>
           </tbody>
         </table>
       </div>
