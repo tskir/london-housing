@@ -31,7 +31,7 @@ function aggregate(records) {
   const years = Array.from({length:maxYear - minYear + 1}, (_, i) => minYear + i);
   const delayYears = Array.from({length:maxYear - delayMinYear + 1}, (_, i) => delayMinYear + i);
   const byYear = new Map(years.map(year => [year, {homes:0, records:0, complete:0, council:[], developer:[]}]));
-  const sizeCounts = sizeBands.map(() => 0);
+  const unitValues = [];
   const sizeByYear = sizeBands.map(() => new Map(years.map(year => [year, {council:[], developer:[]}] )));
   for (const record of records) {
     const actual = parseDate(record.actual_commencement_date);
@@ -40,7 +40,7 @@ function aggregate(records) {
     const row = byYear.get(year);
     const units = record.application_details?.residential_details?.total_no_proposed_residential_units || 0;
     const sizeIndex = sizeBands.findIndex(band => units >= band.min && units <= band.max);
-    if (sizeIndex >= 0) sizeCounts[sizeIndex]++;
+    unitValues.push(units);
     row.records++;
     row.homes += units;
     const submitted = parseDate(record.valid_date);
@@ -56,7 +56,7 @@ function aggregate(records) {
       if (developerDelay >= 0) sizeByYear[sizeIndex].get(year).developer.push(developerDelay);
     }
   }
-  return {years, delayYears, byYear, sizeCounts, sizeByYear};
+  return {years, delayYears, byYear, unitValues, sizeByYear};
 }
 
 function chartOptions(yTitle, yFormat = value => Number(value).toLocaleString(), showLegend = false) {
@@ -69,7 +69,12 @@ function makeLineChart(id, labels, values, color, yTitle, fill = false) {
 }
 
 function makeSizeHistogram(data) {
-  new Chart(document.querySelector('#size-chart'), {type:'bar',data:{labels:sizeBands.map(band => band.label),datasets:[{data:data.sizeCounts,backgroundColor:sizeColors,borderRadius:6}]},options:{...chartOptions('Applications'),plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+  const max = Math.max(...data.unitValues);
+  const binCount = 30;
+  const edges = Array.from({length:binCount + 1}, (_, i) => i === 0 ? 1 : Math.ceil(2 ** (Math.log2(max + 1) * i / binCount)));
+  const counts = edges.slice(0, -1).map((edge, i) => data.unitValues.filter(value => value >= edge && (i === edges.length - 2 ? value <= edges[i + 1] : value < edges[i + 1])).length);
+  const labels = edges.slice(0, -1).map((edge, i) => edge === edges[i + 1] - 1 ? `${edge}` : `${edge}–${edges[i + 1] - 1}`);
+  new Chart(document.querySelector('#size-chart'), {type:'bar',data:{labels,datasets:[{data:counts,backgroundColor:burgundy,borderRadius:2,barPercentage:1,categoryPercentage:1}]},options:{...chartOptions('Applications'),scales:{x:{title:{display:true,text:'Proposed residential units · log-spaced bins'},grid:{display:false},ticks:{maxTicksLimit:12}},y:{title:{display:true,text:'Applications'},beginAtZero:true,grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toLocaleString()}}}}});
 }
 
 function makeSizeDelayChart(data, id, key, title) {
