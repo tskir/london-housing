@@ -87,7 +87,7 @@ function makeBoroughChart(data) {
 }
 
 function makeLagChart(data) {
-  const series = [...data.boroughs].map(([label, borough]) => ({label,data:data.lagYears.map(year => borough.lags.has(year) ? borough.lags.get(year).sum / borough.lags.get(year).count : null),borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}));
+  const series = [...data.boroughs].filter(([, borough]) => borough.records && borough.complete / borough.records >= .02).map(([label, borough]) => ({label,data:data.lagYears.map(year => borough.lags.has(year) ? borough.lags.get(year).sum / borough.lags.get(year).count : null),borderColor:grey,backgroundColor:grey,borderWidth:1.5,pointRadius:0,pointHoverRadius:0,tension:.25}));
   const chart = new Chart(document.querySelector('#lag-chart'), {type:'line',data:{labels:data.lagYears,datasets:series},plugins:[endLabel],options:{...hoverOptions(),responsive:true,maintainAspectRatio:false,layout:{padding:{right:120}},elements:{line:{spanGaps:true}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{title:{display:true,text:'Average lag (months)'},grid:{color:'rgba(23,43,42,.08)'},ticks:{callback:value=>Number(value).toFixed(0)}}}}});
   styleDatasets(chart);
 }
